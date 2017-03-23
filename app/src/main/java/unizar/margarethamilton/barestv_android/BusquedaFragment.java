@@ -11,7 +11,7 @@ import android.view.ViewGroup;
  * Created by ivo on 21/03/17.
  */
 
-public class TabBusquedaFragment extends Fragment {
+public class BusquedaFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -22,7 +22,7 @@ public class TabBusquedaFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    public TabBusquedaFragment(){}
+    public BusquedaFragment(){}
 
     /**
      * Use this factory method to create a new instance of
@@ -33,8 +33,8 @@ public class TabBusquedaFragment extends Fragment {
      * @return A new instance of fragment PlantillaFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static TabBusquedaFragment newInstance(String param1, String param2) {
-        TabBusquedaFragment fragment = new TabBusquedaFragment();
+    public static BusquedaFragment newInstance(String param1, String param2) {
+        BusquedaFragment fragment = new BusquedaFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -94,3 +94,4 @@ public class TabBusquedaFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 }
+

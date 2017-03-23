@@ -73,8 +73,17 @@ public class activity_tabs extends AppCompatActivity {
         public Fragment getItem(int position) {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
-
-            return  TabBusquedaFragment.newInstance("par1", String.valueOf(position));
+            switch (position) {
+                case 0:
+                    return  DestacadoFragment.newInstance("par1", String.valueOf(position));
+                case 1:
+                    return  BusquedaFragment.newInstance("par1", String.valueOf(position));
+                case 2:
+                    return  FavoritosFragment.newInstance("par1", String.valueOf(position));
+                case 3:
+                    return  MapaFragment.newInstance("par1", String.valueOf(position));
+            }
+            return null;
             //return PlaceholderFragment.newInstance(position + 1);
         }
 
