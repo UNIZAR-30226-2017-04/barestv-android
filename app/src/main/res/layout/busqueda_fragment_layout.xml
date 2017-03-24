@@ -2,26 +2,28 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent" android:layout_height="match_parent">
 
-
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:elevation="5dp"
         android:orientation="horizontal">
 
-        <EditText
-            android:id="@+id/title"
-            style="@style/Widget.AppCompat.EditText"
-            android:layout_width="match_parent"
-            android:layout_height="62dp"
-            android:background="@color/colorPrimary"
-            android:drawableLeft="?android:attr/actionModeWebSearchDrawable"
-            android:elevation="5dp"
-            android:hint="@string/search_hint"
-            android:textColor="@android:color/background_light"
-            android:textColorHint="?android:attr/textColorPrimaryInverse" />
-
     </LinearLayout>
+
+    <SearchView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="6dp"/>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_weight="1"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme" />
 
 </RelativeLayout>
