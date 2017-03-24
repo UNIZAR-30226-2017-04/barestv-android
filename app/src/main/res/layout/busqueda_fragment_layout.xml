@@ -10,10 +10,11 @@
 
     </LinearLayout>
 
-    <SearchView
+    <android.support.v7.widget.SearchView
+        android:id="@+id/sview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:elevation="6dp"/>
+        android:elevation="6dp" />
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar"

@@ -1,12 +1,17 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
+import android.widget.TextView;
+
 /**
  * Created by ivo on 21/03/17.
  */
@@ -19,6 +24,7 @@ public class BusquedaFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
+    SearchView searchView;
 
     private OnFragmentInteractionListener mListener;
 
@@ -45,6 +51,7 @@ public class BusquedaFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
@@ -52,7 +59,13 @@ public class BusquedaFragment extends Fragment {
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.busqueda_fragment_layout, container, false);
+        View view = inflater.inflate(R.layout.busqueda_fragment_layout, container, false);
+        searchView = (SearchView) view.findViewById(R.id.sview);
+        searchView.setIconifiedByDefault(false);
+        //searchView.setSubmitButtonEnabled(true);
+        searchView.setQueryHint(getString(R.string.search_hint));
+
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
