@@ -55,9 +55,10 @@ public class MapaFragment extends Fragment implements OnMapReadyCallback{
 
         mgoogleMap = googleMap;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.getUiSettings().setZoomControlsEnabled(true);
 
         googleMap.addMarker(new MarkerOptions().position(new LatLng(41.683493, -0.888591)).title("Universidad de Zaragoza"));
-        CameraPosition Unizar = CameraPosition.builder().target(new LatLng(41.683493, -0.888591)).zoom(16).bearing(0).tilt(0).build();
+        CameraPosition Unizar = CameraPosition.builder().target(new LatLng(41.683493, -0.888591)).zoom(17).bearing(0).tilt(0).build();
 
         googleMap.moveCamera(CameraUpdateFactory.newCameraPosition(Unizar));
     }
