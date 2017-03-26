@@ -8,7 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
+import android.database.Cursor;
+import android.widget.SimpleCursorAdapter;
 import android.view.ViewGroup;
+
+import junit.framework.Test;
 
 
 /**
@@ -30,6 +34,8 @@ public class DestacadoFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    private TestDbAdapter mDbHelper; // Acceso a BBDD
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -60,20 +66,39 @@ public class DestacadoFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mDbHelper = new TestDbAdapter(getActivity());
+        mDbHelper.open();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
-
+        View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
+        /*
         String[] values = new String[] { "Message1", "Message2", "Message3" };
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
                 android.R.layout.simple_list_item_1, values);
-        ListView mList = (ListView) rootView.findViewById(R.id.list);
-        mList.setAdapter(adapter);
-        return rootView;
+        ListView mList = (ListView) view.findViewById(R.id.list);
+        mList.setAdapter(adapter);*/
+
+        // Get all of the programs from the database and create the item list
+        Cursor programsCursor = mDbHelper.fetchAllPrograms();
+        //startManagingCursor(programsCursor);
+
+        // Create an array to specify the fields we want to display in the list
+        String[] from = new String[] { TestDbAdapter.KEY_TITULO, TestDbAdapter.KEY_BAR,
+                TestDbAdapter.KEY_DESCR, TestDbAdapter.KEY_INICIO,  TestDbAdapter.KEY_FIN};
+
+        // and an array of the fields we want to bind those fields to (in this case just text1)
+        int[] to = new int[] { R.id.titulo , R.id.bar, R.id.descr, R.id.inicio, R.id.fin};
+
+        // Now create an array adapter and set it to display using our row
+        SimpleCursorAdapter notes =
+                new SimpleCursorAdapter(getActivity(), R.layout.destacado_listview_content, programsCursor, from, to);
+        ListView mList = (ListView) view.findViewById(R.id.list);
+        mList.setAdapter(notes);
+        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event

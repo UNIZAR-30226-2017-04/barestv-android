@@ -55,6 +55,8 @@ public class activity_tabs extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
 
+        TestDbAdapter mDbHelper = new TestDbAdapter(this);
+        mDbHelper.open();
 
 
     }
