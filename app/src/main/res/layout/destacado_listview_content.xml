@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="10dp" >
+    android:padding="10dp">
 
     <TextView
         android:id="@+id/titulo"
@@ -15,10 +15,10 @@
         android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="Titulo"
         android:textColor="#736F6E"
         android:textSize="22sp"
-        android:textStyle="bold"
-        android:text="Titulo"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/bar"
@@ -30,10 +30,10 @@
         android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="bar"
         android:textColor="#736F6E"
         android:textSize="16sp"
-        android:textStyle="bold"
-        android:text="bar"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/descr"
@@ -45,10 +45,10 @@
         android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="descr"
         android:textColor="#736F6E"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:text="descr"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/inicio"
@@ -60,40 +60,40 @@
         android:layout_marginTop="2dp"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="inicio"
         android:textColor="#736F6E"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:text="inicio"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/aux"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/descr"
-        android:layout_toRightOf="@+id/inicio"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="2dp"
+        android:layout_toRightOf="@+id/inicio"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="-"
         android:textColor="#736F6E"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:text="-"/>
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/fin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/descr"
-        android:layout_toRightOf="@+id/aux"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="2dp"
+        android:layout_toRightOf="@+id/aux"
         android:gravity="center_vertical"
         android:padding="2dip"
+        android:text="fin"
         android:textColor="#736F6E"
         android:textSize="12sp"
-        android:textStyle="bold"
-        android:text="fin"/>
+        android:textStyle="bold" />
 
 </RelativeLayout>
 
