@@ -66,6 +66,8 @@ public class TestDbAdapter {
                     "VALUES ('titulo2', 'bar2', 'descr2','1', 'inicio2', 'fin2', 'cat2')");
             db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
                     "VALUES ('titulo3', 'bar3', 'descr3','1', 'inicio3', 'fin3', 'cat3')");
+            db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
+                    "VALUES ('titulo4', 'bar4', 'descr4','1', 'inicio4', 'fin4', 'cat4')");
         }
 
         @Override

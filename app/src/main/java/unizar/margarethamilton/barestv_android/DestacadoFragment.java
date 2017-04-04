@@ -4,6 +4,8 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.ListFragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ListView;
@@ -23,7 +25,7 @@ import junit.framework.Test;
  * Use the {@link DestacadoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DestacadoFragment extends Fragment {
+public class DestacadoFragment extends ListFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -75,13 +77,28 @@ public class DestacadoFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
-        /*
-        String[] values = new String[] { "Message1", "Message2", "Message3" };
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getActivity(),
-                android.R.layout.simple_list_item_1, values);
-        ListView mList = (ListView) view.findViewById(R.id.list);
-        mList.setAdapter(adapter);*/
 
+        populateListView();
+
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        populateListView();
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
+        return view;
+    }
+
+    /**
+     *  Rellena la lista de destacados con los datos de la BBDD
+     */
+    private void populateListView () {
         // Get all of the programs from the database and create the item list
         Cursor programsCursor = mDbHelper.fetchAllPrograms();
         //startManagingCursor(programsCursor);
@@ -96,9 +113,7 @@ public class DestacadoFragment extends Fragment {
         // Now create an array adapter and set it to display using our row
         SimpleCursorAdapter notes =
                 new SimpleCursorAdapter(getActivity(), R.layout.destacado_listview_content, programsCursor, from, to);
-        ListView mList = (ListView) view.findViewById(R.id.list);
-        mList.setAdapter(notes);
-        return view;
+        setListAdapter(notes);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
