@@ -8,6 +8,7 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AbsListView;
 import android.widget.ListView;
 import android.widget.ArrayAdapter;
 import android.database.Cursor;
@@ -78,6 +79,11 @@ public class DestacadoFragment extends ListFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
+        return view;
+    }
+
+    @Override
+    public void onViewCreated (View view, Bundle savedInstanceState) {
         populateListView();
 
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
@@ -92,9 +98,8 @@ public class DestacadoFragment extends ListFragment {
                     }
                 }
         );
-        return view;
-    }
 
+    }
     /**
      *  Rellena la lista de destacados con los datos de la BBDD
      */
