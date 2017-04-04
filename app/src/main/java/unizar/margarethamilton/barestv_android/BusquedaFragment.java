@@ -1,7 +1,9 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -9,7 +11,10 @@ import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
 
 /**
@@ -24,7 +29,9 @@ public class BusquedaFragment extends Fragment {
     // TODO: Rename and change types of parameters
     private String mParam1;
     private String mParam2;
-    SearchView searchView;
+    private SearchView searchView;
+    private TextView listText;
+    private TestDbAdapter mDbHelper; // Acceso a BBDD
 
     private OnFragmentInteractionListener mListener;
 
@@ -56,6 +63,8 @@ public class BusquedaFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        mDbHelper = new TestDbAdapter(getActivity());
+        mDbHelper.open();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -64,6 +73,23 @@ public class BusquedaFragment extends Fragment {
         searchView.setIconifiedByDefault(false);
         //searchView.setSubmitButtonEnabled(true);
         searchView.setQueryHint(getString(R.string.search_hint));
+        listText = (TextView) view.findViewById(R.id.listText);
+        listText.setText(R.string.progProx);
+        Cursor programsCursor = mDbHelper.fetchAllPrograms();
+        //startManagingCursor(programsCursor);
+
+        // Create an array to specify the fields we want to display in the list
+        String[] from = new String[] { TestDbAdapter.KEY_TITULO, TestDbAdapter.KEY_BAR,
+                TestDbAdapter.KEY_DESCR, TestDbAdapter.KEY_INICIO,  TestDbAdapter.KEY_FIN};
+
+        // and an array of the fields we want to bind those fields to (in this case just text1)
+        int[] to = new int[] { R.id.titulo , R.id.bar, R.id.descr, R.id.inicio, R.id.fin};
+
+        // Now create an array adapter and set it to display using our row
+        SimpleCursorAdapter notes =
+                new SimpleCursorAdapter(getActivity(), R.layout.busqueda_listview_content, programsCursor, from, to);
+        ListView mList = (ListView) view.findViewById(R.id.resList);
+        mList.setAdapter(notes);
 
         return view;
     }
