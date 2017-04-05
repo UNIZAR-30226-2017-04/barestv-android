@@ -61,13 +61,13 @@ public class TestDbAdapter {
             Log.d("TAG", DATABASE_CREATE);
             db.execSQL(DATABASE_CREATE);
             db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
-                    "VALUES ('titulo1', 'bar1', 'descr1','1', 'inicio1', 'fin1', 'cat1')");
+                    "VALUES ('El Hormiguero', 'Taberna Kalandria', 'Programa el Hormiguero, presentado por Pablo Motos','1', '21:00', '23:00', 'entretenimiento')");
             db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
-                    "VALUES ('titulo2', 'bar2', 'descr2','1', 'inicio2', 'fin2', 'cat2')");
+                    "VALUES ('La hora de Jose Mota', 'Dantis', 'Programa de humor presentado por Jose Mota','1', '21:00', '23:00', 'comedia')");
             db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
-                    "VALUES ('titulo3', 'bar3', 'descr3','1', 'inicio3', 'fin3', 'cat3')");
+                    "VALUES ('Real Madrid-A.T.Madrid', 'Almendros', 'Jornada 12,Liga BBVA','1', '20:00', '22:30', 'deporte')");
             db.execSQL("INSERT INTO programa (titulo, bar, descr, destacado, inicio, fin, cat) " +
-                    "VALUES ('titulo4', 'bar4', 'descr4','1', 'inicio4', 'fin4', 'cat4')");
+                    "VALUES ('Barcelona-Sevilla', 'Bar Buenavista', 'Jornada 12,Liga BBVA','1', '17:00', '19:30', 'deporte')");
         }
 
         @Override
