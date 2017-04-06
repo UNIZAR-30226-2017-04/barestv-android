@@ -54,6 +54,10 @@ public class activity_tabs extends AppCompatActivity {
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
+        for (int i = 0; i < tabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = tabLayout.getTabAt(i);
+            tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
+        }
 
         TestDbAdapter mDbHelper = new TestDbAdapter(this);
         mDbHelper.open();
@@ -111,6 +115,12 @@ public class activity_tabs extends AppCompatActivity {
                     return "MAPA";
             }
             return null;
+        }
+        public View getTabView(int position) {
+            View tab = LayoutInflater.from(activity_tabs.this).inflate(R.layout.custom_tab, null);
+            TextView tv = (TextView) tab.findViewById(R.id.custom_text);
+            tv.setText(getPageTitle(position));
+            return tab;
         }
     }
 }

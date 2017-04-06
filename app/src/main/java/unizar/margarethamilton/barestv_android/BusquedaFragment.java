@@ -75,7 +75,7 @@ public class BusquedaFragment extends Fragment {
         searchView.setQueryHint(getString(R.string.search_hint));
         listText = (TextView) view.findViewById(R.id.listText);
         listText.setText(R.string.progProx);
-        Cursor programsCursor = mDbHelper.fetchAllPrograms();
+        Cursor programsCursor = mDbHelper.fetchProgProx();
         //startManagingCursor(programsCursor);
 
         // Create an array to specify the fields we want to display in the list

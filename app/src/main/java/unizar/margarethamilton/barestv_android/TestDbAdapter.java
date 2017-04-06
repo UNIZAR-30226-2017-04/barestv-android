@@ -142,4 +142,13 @@ public class TestDbAdapter {
         return mDb.rawQuery( "select rowid _id,* from programa", null);
     }
 
+    /**
+     * Return a Cursor over the list of programs ordered by "inicio"
+     *
+     * @return Cursor over programs
+     */
+    public Cursor fetchProgProx() {
+        return mDb.rawQuery( "select rowid _id,* from programa ORDER BY inicio ASC", null);
+    }
+
 }
