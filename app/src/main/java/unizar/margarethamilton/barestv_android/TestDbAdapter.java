@@ -108,7 +108,6 @@ public class TestDbAdapter {
     public void close() {
         mDbHelper.close();
     }
-    public  void update() {mDbHelper.onUpgrade(mDb,2,3);}
 
 
     /**

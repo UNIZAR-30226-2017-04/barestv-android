@@ -39,7 +39,6 @@ public class DestacadoFragment extends ListFragment {
     private OnFragmentInteractionListener mListener;
 
     private TestDbAdapter mDbHelper; // Acceso a BBDD
-    private ListView mList;
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -79,7 +78,7 @@ public class DestacadoFragment extends ListFragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
-        mList = (ListView) view.findViewById(R.id.desList);
+
         return view;
     }
 
@@ -94,7 +93,6 @@ public class DestacadoFragment extends ListFragment {
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        mDbHelper.update();
                         populateListView();
                         swipeRefreshLayout.setRefreshing(false);
                     }
@@ -120,7 +118,7 @@ public class DestacadoFragment extends ListFragment {
         // Now create an array adapter and set it to display using our row
         SimpleCursorAdapter notes =
                 new SimpleCursorAdapter(getActivity(), R.layout.destacado_listview_content, programsCursor, from, to);
-        mList.setAdapter(notes);
+        setListAdapter(notes);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
