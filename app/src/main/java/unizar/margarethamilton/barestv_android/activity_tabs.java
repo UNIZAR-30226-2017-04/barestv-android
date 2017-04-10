@@ -20,6 +20,8 @@ import android.view.ViewGroup;
 
 import android.widget.TextView;
 
+import unizar.margarethamilton.connection.ClienteRest;
+
 public class activity_tabs extends AppCompatActivity {
 
     /**
@@ -37,6 +39,7 @@ public class activity_tabs extends AppCompatActivity {
      */
     private ViewPager mViewPager;
     SearchView searchView;
+    private ClienteRest clienteRest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,8 +62,7 @@ public class activity_tabs extends AppCompatActivity {
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
         }
 
-        TestDbAdapter mDbHelper = new TestDbAdapter(this);
-        mDbHelper.open();
+        clienteRest = new ClienteRest();
 
 
     }
@@ -84,9 +86,9 @@ public class activity_tabs extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return  DestacadoFragment.newInstance("par1", String.valueOf(position));
+                    return  DestacadoFragment.newInstance("par1", String.valueOf(position),clienteRest);
                 case 1:
-                    return  BusquedaFragment.newInstance("par1", String.valueOf(position));
+                    return  BusquedaFragment.newInstance("par1", String.valueOf(position),clienteRest);
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
                 case 3:

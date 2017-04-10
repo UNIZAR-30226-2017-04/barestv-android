@@ -12,10 +12,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewOutlineProvider;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
+
+import java.util.HashMap;
+import java.util.List;
+
+import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.listAdapter.ListHashAdapter;
 
 /**
  * Created by ivo on 21/03/17.
@@ -31,9 +38,9 @@ public class BusquedaFragment extends Fragment {
     private String mParam2;
     private SearchView searchView;
     private TextView listText;
-    private TestDbAdapter mDbHelper; // Acceso a BBDD
 
     private OnFragmentInteractionListener mListener;
+    private static ClienteRest clienteRest;
 
     public BusquedaFragment(){}
 
@@ -46,12 +53,13 @@ public class BusquedaFragment extends Fragment {
      * @return A new instance of fragment PlantillaFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static BusquedaFragment newInstance(String param1, String param2) {
+    public static BusquedaFragment newInstance(String param1, String param2, ClienteRest _clienteRest) {
         BusquedaFragment fragment = new BusquedaFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         fragment.setArguments(args);
+        clienteRest = _clienteRest;
         return fragment;
     }
 
@@ -63,8 +71,6 @@ public class BusquedaFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        mDbHelper = new TestDbAdapter(getActivity());
-        mDbHelper.open();
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -75,21 +81,23 @@ public class BusquedaFragment extends Fragment {
         searchView.setQueryHint(getString(R.string.search_hint));
         listText = (TextView) view.findViewById(R.id.listText);
         listText.setText(R.string.progProx);
-        Cursor programsCursor = mDbHelper.fetchProgProx();
-        //startManagingCursor(programsCursor);
 
-        // Create an array to specify the fields we want to display in the list
-        String[] from = new String[] { TestDbAdapter.KEY_TITULO, TestDbAdapter.KEY_BAR,
-                TestDbAdapter.KEY_DESCR, TestDbAdapter.KEY_INICIO,  TestDbAdapter.KEY_FIN};
+        // Obtiene del BD remoto las programaciones destacadas
+        List<HashMap<String, String>> programacion = clienteRest.getProgramacion();
 
-        // and an array of the fields we want to bind those fields to (in this case just text1)
-        int[] to = new int[] { R.id.titulo , R.id.bar, R.id.descr, R.id.inicio, R.id.fin};
+        // Crear un array donde se especifica los datos que se quiere mostrar
+        String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
-        // Now create an array adapter and set it to display using our row
-        SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(getActivity(), R.layout.busqueda_listview_content, programsCursor, from, to);
+        // Crear un array done sse especifica los campos de ListView que se quiere rellenar
+        int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
+                R.id.inicio, R.id.fin};
+
+        // Configurar el adapter
+        ArrayAdapter adapter = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                programacion, from, to);
+
         ListView mList = (ListView) view.findViewById(R.id.resList);
-        mList.setAdapter(notes);
+        mList.setAdapter(adapter);
 
         return view;
     }
