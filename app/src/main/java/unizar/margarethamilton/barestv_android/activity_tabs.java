@@ -86,9 +86,9 @@ public class activity_tabs extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return  DestacadoFragment.newInstance("par1", String.valueOf(position),clienteRest);
+                    return  DestacadoFragment.newInstance(clienteRest);
                 case 1:
-                    return  BusquedaFragment.newInstance("par1", String.valueOf(position),clienteRest);
+                    return  BusquedaFragment.newInstance(clienteRest);
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
                 case 3:
