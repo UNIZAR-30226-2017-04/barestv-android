@@ -8,15 +8,14 @@ import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.widget.AbsListView;
-import android.widget.ListView;
 import android.widget.ArrayAdapter;
-import android.database.Cursor;
-import android.widget.SimpleCursorAdapter;
 import android.view.ViewGroup;
 
-import junit.framework.Test;
+import java.util.HashMap;
+import java.util.List;
 
+import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.listAdapter.ListHashAdapter;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -27,18 +26,12 @@ import junit.framework.Test;
  * create an instance of this fragment.
  */
 public class DestacadoFragment extends ListFragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "clientRest";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
-
-    private TestDbAdapter mDbHelper; // Acceso a BBDD
+    private ClienteRest clienteRest;
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -48,17 +41,15 @@ public class DestacadoFragment extends ListFragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PlantillaFragment.
+     * @param _clienteRest API para conectar a la BBDD remota.
+     * @return A new instance of fragment DestacadoFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static DestacadoFragment newInstance(String param1, String param2) {
+    public static DestacadoFragment newInstance(ClienteRest _clienteRest) {
         DestacadoFragment fragment = new DestacadoFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM1, _clienteRest);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -66,11 +57,8 @@ public class DestacadoFragment extends ListFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            clienteRest = (ClienteRest) getArguments().getSerializable(ARG_PARAM1);
         }
-        mDbHelper = new TestDbAdapter(getActivity());
-        mDbHelper.open();
     }
 
     @Override
@@ -79,11 +67,6 @@ public class DestacadoFragment extends ListFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
-        return view;
-    }
-
-    @Override
-    public void onViewCreated (View view, Bundle savedInstanceState) {
         populateListView();
 
         final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
@@ -98,27 +81,29 @@ public class DestacadoFragment extends ListFragment {
                     }
                 }
         );
-
+        return view;
     }
+
     /**
      *  Rellena la lista de destacados con los datos de la BBDD
      */
     private void populateListView () {
-        // Get all of the programs from the database and create the item list
-        Cursor programsCursor = mDbHelper.fetchAllPrograms();
-        //startManagingCursor(programsCursor);
+        // Obtiene del BBDD remoto las programaciones destacadas
+        List<HashMap<String, String>> programacion = clienteRest.getProgramacion();
 
-        // Create an array to specify the fields we want to display in the list
-        String[] from = new String[] { TestDbAdapter.KEY_TITULO, TestDbAdapter.KEY_BAR,
-                TestDbAdapter.KEY_DESCR, TestDbAdapter.KEY_INICIO,  TestDbAdapter.KEY_FIN};
+        // Crear un array donde se especifica los datos que se quiere mostrar
+        String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
-        // and an array of the fields we want to bind those fields to (in this case just text1)
-        int[] to = new int[] { R.id.titulo , R.id.bar, R.id.descr, R.id.inicio, R.id.fin};
+        // Crear un array donde se especifica los campos de ListView que se quiere rellenar
+        int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
+                                                                            R.id.inicio, R.id.fin};
 
-        // Now create an array adapter and set it to display using our row
-        SimpleCursorAdapter notes =
-                new SimpleCursorAdapter(getActivity(), R.layout.destacado_listview_content, programsCursor, from, to);
-        setListAdapter(notes);
+        // Configurar el adapter
+        ArrayAdapter adapter = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                                                                            programacion, from, to);
+
+
+        setListAdapter(adapter);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
