@@ -132,6 +132,17 @@ public class ClienteRest implements Serializable {
     public List<HashMap<String, String>> getProgramacionDadoBar(String nickbar) {
         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
 
+        {
+            HashMap<String, String> programa = new HashMap<String, String>();
+            programa.put("Titulo", "La hora de Jose Mota");
+            programa.put("Categoria", "Comedia");
+            programa.put("Bar", "Dantis");
+            programa.put("Descr", "Programa de humor presentado por Jose Mota");
+            programa.put("Inicio", "4/3/2017 21:00");
+            programa.put("Fin", "4/3/2017 24:00");
+            programas.add(programa);
+        }
+
         return programas;
     }
 

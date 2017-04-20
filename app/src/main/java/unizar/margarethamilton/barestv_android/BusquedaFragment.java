@@ -4,11 +4,16 @@ import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -59,16 +64,85 @@ public class BusquedaFragment extends Fragment {
         }
     }
 
+
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.busqueda_fragment_layout, container, false);
+        final ListView mList = (ListView) view.findViewById(R.id.resList);
         searchView = (SearchView) view.findViewById(R.id.sview);
         searchView.setIconifiedByDefault(false);
         //searchView.setSubmitButtonEnabled(true);
         searchView.setQueryHint(getString(R.string.search_hint));
+
         listText = (TextView) view.findViewById(R.id.listText);
         listText.setText(R.string.progProx);
+        //Se obtiene la programacion proxima
+        final ArrayAdapter adapter = progProx();
 
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefreshProx);
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        ArrayAdapter adapter = progProx();
+                        mList.setAdapter(adapter);
+                        swipeRefreshLayout.setRefreshing(false);
+                    }
+                }
+        );
+
+
+
+        mList.setAdapter(adapter);
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                listText.setText("Búsqueda: "+query);
+                ArrayAdapter adapter = busqueda(query);
+                mList.setAdapter(adapter);
+                swipeRefreshLayout.setEnabled(false);
+
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+//                listText.setText(newText);
+                return false;
+            }
+        });
+        ImageView closeButton = (ImageView)searchView.findViewById(R.id.search_close_btn);
+
+        // Set on click listener
+        closeButton.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+            listText.setText(R.string.progProx);
+                searchView.setQuery("",false);
+                ArrayAdapter adapter = progProx();
+                mList.setAdapter(adapter);
+                swipeRefreshLayout.setEnabled(true);
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+
+                return false;
+            }
+        });
+
+        return view;
+    }
+
+    public ArrayAdapter progProx(){
+        //TODO: Se llama a la API para que devuelva la programacion proxima
         // Obtiene del BD remoto las programaciones destacadas
         List<HashMap<String, String>> programacion = clienteRest.getProgramacion();
 
@@ -80,13 +154,25 @@ public class BusquedaFragment extends Fragment {
                 R.id.inicio, R.id.fin};
 
         // Configurar el adapter
-        ArrayAdapter adapter = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+        return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
                 programacion, from, to);
 
-        ListView mList = (ListView) view.findViewById(R.id.resList);
-        mList.setAdapter(adapter);
 
-        return view;
+    }
+
+
+    public ArrayAdapter busqueda(String query){
+        //TODO: Llama a la API para realizar la busqueda, devuelve List<HashMap<String, String>>
+        List<HashMap<String, String>> programacion = clienteRest.getProgramacionDadoBar("Dantis");
+        String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+
+        int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
+                R.id.inicio, R.id.fin};
+
+        return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                programacion, from, to);
+
+
     }
 
     // TODO: Rename method, update argument and hook method into UI event
