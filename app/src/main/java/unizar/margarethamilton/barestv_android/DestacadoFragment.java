@@ -89,7 +89,7 @@ public class DestacadoFragment extends ListFragment {
      */
     private void populateListView () {
         // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> programacion = clienteRest.getProgramacion();
+        List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
 
         // Crear un array donde se especifica los datos que se quiere mostrar
         String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};

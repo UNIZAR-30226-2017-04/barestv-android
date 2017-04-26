@@ -1,9 +1,14 @@
 package unizar.margarethamilton.connection;
 
+import org.json.*;
+import com.loopj.android.http.*;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import cz.msebera.android.httpclient.Header;
 
 /**
  * Created by Xian on 2017/4/10.
@@ -11,8 +16,21 @@ import java.util.List;
 
 public class ClienteRest implements Serializable {
 
-    private final String URI = "http://localhost:8080/unizar.margarethamilton.baresTvServicio/rest";
+    private static final String URI = "http://localhost:8080/unizar.margarethamilton.baresTvServicio/rest";
+    private List<HashMap<String, String>> Objs;
+    private static AsyncHttpClient client = new AsyncHttpClient();
 
+    private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.get(getAbsoluteUrl(url), params, responseHandler);
+    }
+
+    private static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
+        client.post(getAbsoluteUrl(url), params, responseHandler);
+    }
+
+    private static String getAbsoluteUrl(String relativeUrl) {
+        return URI + relativeUrl;
+    }
     /**
      * @return lista de diccionarios de todos los bares y sus detalles
      *         ordenados alfabéticamente (a-z) por nombre del bar
@@ -152,8 +170,31 @@ public class ClienteRest implements Serializable {
      *         próximos a más lejanos en el tiempo
      */
     public List<HashMap<String, String>> getProgramacionDestacada() {
-        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
-        return programas;
+        Objs = new ArrayList<HashMap<String, String>>();
+        get("destacados",null, new JsonHttpResponseHandler() {
+            @Override
+            public void onSuccess(int statusCode, Header[] headers, JSONArray array) {
+                JSONObject obj = null;
+                HashMap<String, String> hmp = new HashMap<String, String>();
+                for (int i=0; i < array.length(); i++) {
+                    try {
+                        obj = array.getJSONObject(i);
+                        hmp.put("Titulo", obj.getString("Titulo"));
+                        hmp.put("Categoria", obj.getString("Cat"));
+                        hmp.put("Bar", obj.getString("Bar"));
+                        hmp.put("Descr", obj.getString("Descr"));
+                        hmp.put("Inicio", obj.getString("Inicio"));
+                        hmp.put("Fin", obj.getString("Fin"));
+                        Objs.add(hmp);
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+        });
+        return Objs;
     }
 
     /**
