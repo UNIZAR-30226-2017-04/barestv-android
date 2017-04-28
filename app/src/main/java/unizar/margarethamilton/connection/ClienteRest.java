@@ -16,7 +16,7 @@ import cz.msebera.android.httpclient.Header;
 
 public class ClienteRest implements Serializable {
 
-    private static final String URI = "http://localhost:8080/unizar.margarethamilton.baresTvServicio/rest";
+    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
     private List<HashMap<String, String>> Objs;
     private static AsyncHttpClient client = new AsyncHttpClient();
 
@@ -171,7 +171,7 @@ public class ClienteRest implements Serializable {
      */
     public List<HashMap<String, String>> getProgramacionDestacada() {
         Objs = new ArrayList<HashMap<String, String>>();
-        get("destacados",null, new JsonHttpResponseHandler() {
+        get("bar",null, new JsonHttpResponseHandler() {
             @Override
             public void onSuccess(int statusCode, Header[] headers, JSONArray array) {
                 JSONObject obj = null;
@@ -179,13 +179,16 @@ public class ClienteRest implements Serializable {
                 for (int i=0; i < array.length(); i++) {
                     try {
                         obj = array.getJSONObject(i);
+                        android.util.Log.d("TAAAAAAAAAAG", obj.getString("Titulo"));
+                        android.util.Log.d("TAAAAAAAAAAG", obj.getString("Bar"));
+                        /*
                         hmp.put("Titulo", obj.getString("Titulo"));
                         hmp.put("Categoria", obj.getString("Cat"));
                         hmp.put("Bar", obj.getString("Bar"));
                         hmp.put("Descr", obj.getString("Descr"));
                         hmp.put("Inicio", obj.getString("Inicio"));
                         hmp.put("Fin", obj.getString("Fin"));
-                        Objs.add(hmp);
+                        Objs.add(hmp);*/
 
                     } catch (JSONException e) {
                         e.printStackTrace();
