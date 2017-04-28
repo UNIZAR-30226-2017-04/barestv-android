@@ -28,7 +28,7 @@ import unizar.margarethamilton.listAdapter.ListHashAdapter;
 public class DestacadoFragment extends ListFragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "clientRest";
-
+    private SwipeRefreshLayout swipeRefreshLayout = null;
 
     private OnFragmentInteractionListener mListener;
     private ClienteRest clienteRest;
@@ -67,9 +67,9 @@ public class DestacadoFragment extends ListFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
-        populateListView();
+        clienteRest.getProgramacionDestacada(this, null);
 
-        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
@@ -77,7 +77,7 @@ public class DestacadoFragment extends ListFragment {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
                         populateListView();
-                        swipeRefreshLayout.setRefreshing(false);
+
                     }
                 }
         );
@@ -89,8 +89,8 @@ public class DestacadoFragment extends ListFragment {
      */
     private void populateListView () {
         // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
-
+        List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada(this,swipeRefreshLayout);
+        /*
         // Crear un array donde se especifica los datos que se quiere mostrar
         String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
@@ -103,7 +103,7 @@ public class DestacadoFragment extends ListFragment {
                                                                             programacion, from, to);
 
 
-        setListAdapter(adapter);
+        setListAdapter(adapter);*/
     }
 
     // TODO: Rename method, update argument and hook method into UI event
