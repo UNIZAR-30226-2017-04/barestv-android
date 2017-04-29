@@ -1,21 +1,21 @@
 package unizar.margarethamilton.connection;
 
-import android.content.Context;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.widget.ArrayAdapter;
-
 import org.json.*;
-import com.loopj.android.http.*;
 
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import cz.msebera.android.httpclient.Header;
-import unizar.margarethamilton.barestv_android.DestacadoFragment;
-import unizar.margarethamilton.barestv_android.R;
-import unizar.margarethamilton.listAdapter.ListHashAdapter;
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.GET;
+
 
 /**
  * Created by Xian on 2017/4/10.
@@ -24,25 +24,7 @@ import unizar.margarethamilton.listAdapter.ListHashAdapter;
 public class ClienteRest implements Serializable {
 
     private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
-    private List<HashMap<String, String>> Objs;
 
-    private static AsyncHttpClient client = new AsyncHttpClient();
-
-    private static void get(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.get(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static void post(String url, RequestParams params, AsyncHttpResponseHandler responseHandler) {
-        client.post(getAbsoluteUrl(url), params, responseHandler);
-    }
-
-    private static String getAbsoluteUrl(String relativeUrl) {
-        return URI + relativeUrl;
-    }
-    /**
-     * @return lista de diccionarios de todos los bares y sus detalles
-     *         ordenados alfabéticamente (a-z) por nombre del bar
-     */
     public List<HashMap<String, String>> getBares() {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
 
@@ -172,53 +154,54 @@ public class ClienteRest implements Serializable {
         return programas;
     }
 
+
+    private interface ProgramacionDestacado {
+        @GET("destacados")
+        Call<ResponseBody> programacionDestacado();
+    }
+
     /**
      * @return lista de diccionarios de todos los programas presentes o futuros
      *         marcados como destacados y sus detalles ordenados de más
      *         próximos a más lejanos en el tiempo
      */
-    public List<HashMap<String, String>> getProgramacionDestacada(final DestacadoFragment fragment, final SwipeRefreshLayout swipeRefreshLayout) {
-        Objs = new ArrayList<HashMap<String, String>>();
-        get("destacados",null, new JsonHttpResponseHandler() {
-            @Override
-            public void onSuccess(int statusCode, Header[] headers, JSONArray array) {
-                JSONObject obj = null;
+    public List<HashMap<String, String>> getProgramacionDestacada() {
+        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        ProgramacionDestacado pd = retrofit.create(ProgramacionDestacado.class);
+        Call<ResponseBody> pds = pd.programacionDestacado();
+        try {
+            String response = pds.execute().body().string();
 
-                for (int i=0; i < array.length(); i++) {
-                    try {
-                        obj = array.getJSONObject(i);
-                        HashMap<String, String> hmp = new HashMap<String, String>();
-                        android.util.Log.d("TAAAAAAAAAAG", obj.getString("Titulo"));
-                        android.util.Log.d("TAAAAAAAAAAG", obj.getString("Bar"));
-                        hmp.put("Titulo", obj.getString("Titulo"));
-                        hmp.put("Categoria", obj.getString("Cat"));
-                        hmp.put("Bar", obj.getString("Bar"));
-                        hmp.put("Descr", obj.getString("Descr"));
-                        hmp.put("Inicio", obj.getString("Inicio"));
-                        hmp.put("Fin", obj.getString("Fin"));
-                        Objs.add(hmp);
+            JSONArray array = new JSONArray(response);
+            JSONObject obj = null;
 
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                // Crear un array donde se especifica los datos que se quiere mostrar
-                String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
 
-                // Crear un array donde se especifica los campos de ListView que se quiere rellenar
-                int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
-                        R.id.inicio, R.id.fin};
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-                // Configurar el adapter
-                ArrayAdapter adapter = new ListHashAdapter(fragment.getActivity(), R.layout.destacado_listview_content,
-                        Objs, from, to);
+        pds.cancel();
 
-
-                fragment.setListAdapter(adapter);
-                if (swipeRefreshLayout != null) swipeRefreshLayout.setRefreshing(false);
-            }
-        });
-        return Objs;
+        return programas;
     }
 
     /**

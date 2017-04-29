@@ -1,4 +1,4 @@
-package unizar.margarethamilton.listAdapter;
+package unizar.margarethamilton.listViewConfig;
 
 import android.content.Context;
 import android.view.LayoutInflater;

@@ -2,6 +2,7 @@ package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
@@ -10,12 +11,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
+import android.widget.ListView;
 
 import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
-import unizar.margarethamilton.listAdapter.ListHashAdapter;
+import unizar.margarethamilton.listViewConfig.ListHashAdapter;
+import unizar.margarethamilton.listViewConfig.Params;
+import unizar.margarethamilton.listViewConfig.SetListViewTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -25,13 +29,15 @@ import unizar.margarethamilton.listAdapter.ListHashAdapter;
  * Use the {@link DestacadoFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DestacadoFragment extends ListFragment {
+public class DestacadoFragment extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "clientRest";
-    private SwipeRefreshLayout swipeRefreshLayout = null;
+
 
     private OnFragmentInteractionListener mListener;
     private ClienteRest clienteRest;
+
+
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -67,16 +73,20 @@ public class DestacadoFragment extends ListFragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
-        clienteRest.getProgramacionDestacada(this, null);
+        final ListView mList = (ListView) view.findViewById(R.id.list);
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setRefreshing(true);
 
-        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        final Params params = new Params(this, swipeRefreshLayout, clienteRest, mList);
+        new SetListViewTask().execute(params);
+
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
                     @Override
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        populateListView();
+                        new SetListViewTask().execute(params);
 
                     }
                 }
@@ -84,27 +94,6 @@ public class DestacadoFragment extends ListFragment {
         return view;
     }
 
-    /**
-     *  Rellena la lista de destacados con los datos de la BBDD
-     */
-    private void populateListView () {
-        // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada(this,swipeRefreshLayout);
-        /*
-        // Crear un array donde se especifica los datos que se quiere mostrar
-        String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
-
-        // Crear un array donde se especifica los campos de ListView que se quiere rellenar
-        int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
-                                                                            R.id.inicio, R.id.fin};
-
-        // Configurar el adapter
-        ArrayAdapter adapter = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
-                                                                            programacion, from, to);
-
-
-        setListAdapter(adapter);*/
-    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -144,5 +133,7 @@ public class DestacadoFragment extends ListFragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
 
 }
