@@ -68,6 +68,7 @@ public class DestacadoFragment extends Fragment {
         if (getArguments() != null) {
             clienteRest = (ClienteRest) getArguments().getSerializable(ARG_PARAM1);
         }
+        setRetainInstance(true);
     }
 
     @Override
@@ -152,11 +153,6 @@ public class DestacadoFragment extends Fragment {
             // Eliminamos el snackbar anterior si no esta elinimado
             if (snackbar != null) snackbar.dismiss();
 
-            // No se permite que se rote la pantalla cuando se realiza la peticion al API
-            if(DestacadoFragment.this.getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            } else DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
 
@@ -183,18 +179,17 @@ public class DestacadoFragment extends Fragment {
          */
         protected void onPostExecute(ArrayAdapter adapter) {
             if (adapter == null) {
-                // Mensaje error en caso de no poder conectar con la BBDD
-                snackbar  = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Action", null);
-                snackbar.show();
+                try {
+                    // Mensaje error en caso de no poder conectar con la BBDD
+                    snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Action", null);
+                    snackbar.show();
+                } catch (Exception x) {}
                 swipeRefreshLayout.setRefreshing(false);
             } else {
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }
-
-            // Restablece la rotacion de pantalla
-            DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
 
