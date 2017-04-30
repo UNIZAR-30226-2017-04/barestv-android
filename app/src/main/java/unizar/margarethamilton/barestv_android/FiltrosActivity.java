@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 
 
 public class FiltrosActivity extends AppCompatActivity {
@@ -45,8 +46,8 @@ public class FiltrosActivity extends AppCompatActivity {
         // Crear un array done sse especifica los campos de ListView que se quiere rellenar
         int[] to = new int[] { R.id.cat};
 
-//        categories.setAdapter(new ListHashAdapter(this, R.layout.category_grid,
-//                programacion, from, to));
+        categories.setAdapter(new ListHashAdapter(this, R.layout.category_grid,
+                programacion, from, to));
 
     }
 
