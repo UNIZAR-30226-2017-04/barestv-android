@@ -12,14 +12,13 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
 import unizar.margarethamilton.listViewConfig.ListHashAdapter;
-import unizar.margarethamilton.listViewConfig.Params;
-import unizar.margarethamilton.listViewConfig.SetListViewTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +35,9 @@ public class DestacadoFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
     private ClienteRest clienteRest;
-
+    private View view ;
+    private ListView mList;
+    private SwipeRefreshLayout swipeRefreshLayout;
 
 
     public DestacadoFragment() {
@@ -71,14 +72,13 @@ public class DestacadoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
+        view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
-        final ListView mList = (ListView) view.findViewById(R.id.list);
-        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        mList = (ListView) view.findViewById(R.id.list);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setRefreshing(true);
 
-        final Params params = new Params(this, swipeRefreshLayout, clienteRest, mList);
-        new SetListViewTask().execute(params);
+        new SetPDestacadosTask().execute();
 
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -86,7 +86,7 @@ public class DestacadoFragment extends Fragment {
                     public void onRefresh() {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
-                        new SetListViewTask().execute(params);
+                        new SetPDestacadosTask().execute();
 
                     }
                 }
@@ -135,5 +135,42 @@ public class DestacadoFragment extends Fragment {
     }
 
 
+    /**
+     * Rellena el listview con datods dados por el API de forma asincrona
+     */
+    private class SetPDestacadosTask extends AsyncTask<Void, Void, ArrayAdapter> {
+
+        /**
+         * Comunicacion asincrona
+         * @param e
+         * @return
+         */
+        protected ArrayAdapter doInBackground(Void... e) {
+            // Obtiene del BBDD remoto las programaciones destacadas
+            List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
+            if (programacion == null) return null;
+            // Crear un array donde se especifica los datos que se quiere mostrar
+            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+
+            // Crear un array donde se especifica los campos de ListView que se quiere rellenar
+            int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
+                    R.id.inicio, R.id.fin};
+
+            // Configurar el adapter
+            ArrayAdapter adapter = new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
+                    programacion, from, to);
+
+            return adapter;
+        }
+
+        /**
+         * Una vez obtenido los datos, se rellena el listview
+         * @param adapter
+         */
+        protected void onPostExecute(ArrayAdapter adapter) {
+            mList.setAdapter(adapter);
+            swipeRefreshLayout.setRefreshing(false);
+        }
+    }
 
 }

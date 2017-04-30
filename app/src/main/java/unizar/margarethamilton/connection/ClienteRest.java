@@ -194,7 +194,7 @@ public class ClienteRest implements Serializable {
                     e.printStackTrace();
                 }}
         } catch (IOException e) {
-            e.printStackTrace();
+            return null;
         } catch (JSONException e) {
             e.printStackTrace();
         }
