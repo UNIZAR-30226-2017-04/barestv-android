@@ -1,11 +1,13 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +36,7 @@ public class BusquedaFragment extends Fragment {
 
     private SearchView searchView;
     private TextView listText;
+    private Toolbar mToolbar;
 
     private OnFragmentInteractionListener mListener;
     private static ClienteRest clienteRest;
@@ -69,10 +72,19 @@ public class BusquedaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.busqueda_fragment_layout, container, false);
+
         final ListView mList = (ListView) view.findViewById(R.id.resList);
         searchView = (SearchView) view.findViewById(R.id.sview);
         searchView.setIconifiedByDefault(false);
-        //searchView.setSubmitButtonEnabled(true);
+        mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        mToolbar.inflateMenu(R.menu.menu_toolbar);
+        mToolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                abrirFiltro();
+                return false;
+            }
+        });
         searchView.setQueryHint(getString(R.string.search_hint));
 
         listText = (TextView) view.findViewById(R.id.listText);
@@ -141,6 +153,11 @@ public class BusquedaFragment extends Fragment {
         return view;
     }
 
+    private void abrirFiltro() {
+        Intent i = new Intent(getActivity(), FiltrosActivity.class);
+        startActivityForResult(i, 0);
+    }
+
     public ArrayAdapter progProx(){
         //TODO: Se llama a la API para que devuelva la programacion proxima
         // Obtiene del BD remoto las programaciones destacadas
@@ -198,6 +215,7 @@ public class BusquedaFragment extends Fragment {
         super.onDetach();
         mListener = null;
     }
+
 
     /**
      * This interface must be implemented by activities that contain this

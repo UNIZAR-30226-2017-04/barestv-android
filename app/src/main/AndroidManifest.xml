@@ -2,9 +2,13 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="unizar.margarethamilton.barestv_android">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+
+    <uses-feature
+        android:glEsVersion="0x00020000"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -20,18 +24,25 @@
             </intent-filter>
         </activity>
 
-        <!--Maps Android Key-->
+        <!-- Maps Android Key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyBB5a4jGpahlPNP7-zup6RSWdJc1YU-09c"/>
-        <!--Maps-->
+            android:value="AIzaSyBB5a4jGpahlPNP7-zup6RSWdJc1YU-09c" />
+        <!-- Maps -->
 
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".activity_tabs" />
 
+        <activity
+            android:name=".FiltrosActivity"
+            android:label="@string/title_activity_filtros"
+            android:parentActivityName=".activity_tabs"
+            android:theme="@style/AppTheme">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="unizar.margarethamilton.barestv_android.activity_tabs" />
+        </activity>
     </application>
-
-    <uses-feature
-        android:glEsVersion="0x00020000"
-        android:required="true"
-        />
 
 </manifest>

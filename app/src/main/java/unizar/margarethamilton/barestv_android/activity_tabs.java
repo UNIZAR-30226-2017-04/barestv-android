@@ -1,5 +1,6 @@
 package unizar.margarethamilton.barestv_android;
 
+import android.content.Intent;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -19,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import android.widget.TextView;
+import android.widget.Toast;
 
 import unizar.margarethamilton.connection.ClienteRest;
 
@@ -45,7 +47,8 @@ public class activity_tabs extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
-
+        Intent in = getIntent();
+        int currentTab = in.getIntExtra("Tab",0);
 
         // Create the adapter that will return a fragment for each of the four
         // primary sections of the activity.
@@ -61,7 +64,7 @@ public class activity_tabs extends AppCompatActivity {
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
         }
-
+        mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
 
 
@@ -123,6 +126,15 @@ public class activity_tabs extends AppCompatActivity {
             TextView tv = (TextView) tab.findViewById(R.id.custom_text);
             tv.setText(getPageTitle(position));
             return tab;
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == RESULT_OK) {
+            if (data.hasExtra("Tab")) {
+                    mViewPager.setCurrentItem(3);
+            }
         }
     }
 }
