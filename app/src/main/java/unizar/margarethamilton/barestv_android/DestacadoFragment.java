@@ -148,7 +148,7 @@ public class DestacadoFragment extends Fragment {
         protected ArrayAdapter doInBackground(Void... e) {
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
-            if (programacion == null) return null;
+
             // Crear un array donde se especifica los datos que se quiere mostrar
             String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
