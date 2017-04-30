@@ -1,9 +1,12 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -146,9 +149,13 @@ public class DestacadoFragment extends Fragment {
          * @return
          */
         protected ArrayAdapter doInBackground(Void... e) {
+            if(DestacadoFragment.this.getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+            } else DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
-
+            if (programacion == null) return null;
             // Crear un array donde se especifica los datos que se quiere mostrar
             String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
@@ -158,7 +165,7 @@ public class DestacadoFragment extends Fragment {
 
             // Configurar el adapter
             ArrayAdapter adapter = new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
-                    programacion, from, to);
+                        programacion, from, to);
 
             return adapter;
         }
@@ -168,8 +175,15 @@ public class DestacadoFragment extends Fragment {
          * @param adapter
          */
         protected void onPostExecute(ArrayAdapter adapter) {
-            mList.setAdapter(adapter);
-            swipeRefreshLayout.setRefreshing(false);
+            if (adapter == null) {
+                Snackbar.make(view, "No se ha podido establecer la conexion con la base de datos remota", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Action", null).show();
+                swipeRefreshLayout.setRefreshing(false);
+            } else {
+                mList.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+            DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
 
