@@ -9,9 +9,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -23,7 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
-import unizar.margarethamilton.listAdapter.ListHashAdapter;
+import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 
 import static android.app.Activity.RESULT_OK;
 

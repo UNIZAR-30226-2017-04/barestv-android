@@ -1,9 +1,21 @@
 package unizar.margarethamilton.connection;
 
+import org.json.*;
+
+
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.http.GET;
+
 
 /**
  * Created by Xian on 2017/4/10.
@@ -11,12 +23,8 @@ import java.util.List;
 
 public class ClienteRest implements Serializable {
 
-    private final String URI = "http://localhost:8080/unizar.margarethamilton.baresTvServicio/rest";
+    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
 
-    /**
-     * @return lista de diccionarios de todos los bares y sus detalles
-     *         ordenados alfabéticamente (a-z) por nombre del bar
-     */
     public List<HashMap<String, String>> getBares() {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
 
@@ -146,6 +154,12 @@ public class ClienteRest implements Serializable {
         return programas;
     }
 
+
+    private interface ProgramacionDestacado {
+        @GET("destacados")
+        Call<ResponseBody> programacionDestacado();
+    }
+
     /**
      * @return lista de diccionarios de todos los programas presentes o futuros
      *         marcados como destacados y sus detalles ordenados de más
@@ -153,6 +167,40 @@ public class ClienteRest implements Serializable {
      */
     public List<HashMap<String, String>> getProgramacionDestacada() {
         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        ProgramacionDestacado pd = retrofit.create(ProgramacionDestacado.class);
+        Call<ResponseBody> pds = pd.programacionDestacado();
+        try {
+            String response = pds.execute().body().string();
+
+            JSONArray array = new JSONArray(response);
+            JSONObject obj = null;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        pds.cancel();
+
         return programas;
     }
 
