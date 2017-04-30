@@ -8,14 +8,12 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.ListFragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,6 +39,7 @@ public class DestacadoFragment extends Fragment {
     private View view ;
     private ListView mList;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private Snackbar snackbar = null;
 
 
     public DestacadoFragment() {
@@ -149,13 +148,21 @@ public class DestacadoFragment extends Fragment {
          * @return
          */
         protected ArrayAdapter doInBackground(Void... e) {
+
+            // Eliminamos el snackbar anterior si no esta elinimado
+            if (snackbar != null) snackbar.dismiss();
+
+            // No se permite que se rote la pantalla cuando se realiza la peticion al API
             if(DestacadoFragment.this.getActivity().getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             } else DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
+
+            // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
+
             // Crear un array donde se especifica los datos que se quiere mostrar
             String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
@@ -176,13 +183,17 @@ public class DestacadoFragment extends Fragment {
          */
         protected void onPostExecute(ArrayAdapter adapter) {
             if (adapter == null) {
-                Snackbar.make(view, "No se ha podido establecer la conexion con la base de datos remota", Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Action", null).show();
+                // Mensaje error en caso de no poder conectar con la BBDD
+                snackbar  = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Action", null);
+                snackbar.show();
                 swipeRefreshLayout.setRefreshing(false);
             } else {
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }
+
+            // Restablece la rotacion de pantalla
             DestacadoFragment.this.getActivity().setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
         }
     }
