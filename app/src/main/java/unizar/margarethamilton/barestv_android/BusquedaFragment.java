@@ -25,6 +25,8 @@ import java.util.List;
 import unizar.margarethamilton.connection.ClienteRest;
 import unizar.margarethamilton.listAdapter.ListHashAdapter;
 
+import static android.app.Activity.RESULT_OK;
+
 /**
  * Created by ivo on 21/03/17.
  */
@@ -155,7 +157,7 @@ public class BusquedaFragment extends Fragment {
 
     private void abrirFiltro() {
         Intent i = new Intent(getActivity(), FiltrosActivity.class);
-        startActivityForResult(i, 0);
+        startActivityForResult(i, RESULT_OK);
     }
 
     public ArrayAdapter progProx(){

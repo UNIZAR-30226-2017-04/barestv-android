@@ -1,5 +1,6 @@
 package unizar.margarethamilton.barestv_android;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
-import unizar.margarethamilton.listAdapter.ListHashAdapter;
+
 
 public class FiltrosActivity extends AppCompatActivity {
     private static ClienteRest clienteRest;
@@ -30,6 +31,7 @@ public class FiltrosActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+                finish();
             }
         });
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -43,9 +45,19 @@ public class FiltrosActivity extends AppCompatActivity {
         // Crear un array done sse especifica los campos de ListView que se quiere rellenar
         int[] to = new int[] { R.id.cat};
 
-        categories.setAdapter(new ListHashAdapter(this, R.layout.category_grid,
-                programacion, from, to));
+//        categories.setAdapter(new ListHashAdapter(this, R.layout.category_grid,
+//                programacion, from, to));
 
+    }
+
+    @Override
+    public void finish() {
+        // Prepare data intent
+        Intent data = new Intent();
+        data.putExtra("Tab",1);
+        // Activity finished ok, return the data
+        setResult(RESULT_OK, data);
+        super.finish();
     }
 
 }
