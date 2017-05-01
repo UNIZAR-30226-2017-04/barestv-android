@@ -1,6 +1,7 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -40,8 +41,8 @@ public class activity_tabs extends AppCompatActivity {
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-    SearchView searchView;
     private ClienteRest clienteRest;
+    private BusquedaFragment busquedaFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,10 +67,27 @@ public class activity_tabs extends AppCompatActivity {
         }
         mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
-
+//        Intent i = new Intent(this, resultTest.class);
+//        i.putExtra("ClitenteRest",clienteRest);
+//        startActivityForResult(i, 1);
 
     }
 
+
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        super.onActivityResult(requestCode,resultCode,data);
+//        int res = 0;
+//        if (resultCode == RESULT_OK) {
+//            res=1;
+//            if (data.hasExtra("Tab")) {
+//                mViewPager.setCurrentItem(3);
+//            }
+//            if(data.hasExtra("FiltroCategoria")){
+//                busquedaFragment.aplicarFiltroCategoria(data.getStringExtra("FiltroCategoria"));
+//            }
+//        }
+//    }
 
 
 
@@ -91,7 +109,8 @@ public class activity_tabs extends AppCompatActivity {
                 case 0:
                     return  DestacadoFragment.newInstance(clienteRest);
                 case 1:
-                    return  BusquedaFragment.newInstance(clienteRest);
+                    busquedaFragment=BusquedaFragment.newInstance(clienteRest);
+                    return  busquedaFragment;
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
                 case 3:
@@ -129,12 +148,4 @@ public class activity_tabs extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (data.hasExtra("Tab")) {
-                    mViewPager.setCurrentItem(3);
-            }
-        }
-    }
 }

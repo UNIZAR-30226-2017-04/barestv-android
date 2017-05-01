@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
@@ -17,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,6 +39,9 @@ public class BusquedaFragment extends Fragment {
     private SearchView searchView;
     private TextView listText;
     private Toolbar mToolbar;
+    private ListView mList;
+    private boolean hayBusqueda = false;
+    private String filtroCategoria="";
 
     private OnFragmentInteractionListener mListener;
     private static ClienteRest clienteRest;
@@ -72,8 +77,7 @@ public class BusquedaFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.busqueda_fragment_layout, container, false);
-
-        final ListView mList = (ListView) view.findViewById(R.id.resList);
+        mList = (ListView) view.findViewById(R.id.resList);
         searchView = (SearchView) view.findViewById(R.id.sview);
         searchView.setIconifiedByDefault(false);
         mToolbar = (Toolbar) view.findViewById(R.id.toolbar);
@@ -155,7 +159,8 @@ public class BusquedaFragment extends Fragment {
 
     private void abrirFiltro() {
         Intent i = new Intent(getActivity(), FiltrosActivity.class);
-        startActivityForResult(i, RESULT_OK);
+        i.putExtra("ClitenteRest",clienteRest);
+        startActivityForResult(i, 1);
     }
 
     public ArrayAdapter progProx(){
@@ -169,12 +174,21 @@ public class BusquedaFragment extends Fragment {
         // Crear un array done sse especifica los campos de ListView que se quiere rellenar
         int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                 R.id.inicio, R.id.fin};
+        if(!filtroCategoria.isEmpty()) {
+            List<HashMap<String, String>> programacionFiltrada =new ArrayList<HashMap<String, String>>();
+            for(HashMap<String,String> e:programacion){
+                if(e.containsValue(filtroCategoria)){
+                    programacionFiltrada.add(e);
+                }
+            }
+            // Configurar el adapter
+            return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                    programacionFiltrada, from, to);
 
-        // Configurar el adapter
-        return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
-                programacion, from, to);
-
-
+        }else{
+            return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                    programacion, from, to);
+        }
     }
 
 
@@ -197,6 +211,16 @@ public class BusquedaFragment extends Fragment {
         if (mListener != null) {
             mListener.onFragmentInteraction(uri);
         }
+    }
+/*Aplica el filtro de categoria a la programacion resultado*/
+    public void aplicarFiltroCategoria(String categoria){
+        filtroCategoria=categoria;
+        ArrayAdapter adapter = progProx();
+        mList.setAdapter(adapter);
+    }
+
+    public void aplicarFiltroFecha(String categoria){
+
     }
 
     @Override
@@ -230,6 +254,22 @@ public class BusquedaFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        //progProx();
+    }
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode,resultCode,data);
+//            if (data.hasExtra("Tab")) {
+//                mViewPager.setCurrentItem(3);
+//            }
+            if(data.hasExtra("FiltroCategoria")){
+               aplicarFiltroCategoria(data.getStringExtra("FiltroCategoria"));
+            }
     }
 }
 

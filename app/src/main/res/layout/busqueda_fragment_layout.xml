@@ -6,7 +6,7 @@
 
     <android.support.v7.widget.SearchView
         android:id="@+id/sview"
-        android:layout_width="368dp"
+        android:layout_width="330dp"
         android:layout_height="wrap_content"
         android:elevation="10dp"
 
