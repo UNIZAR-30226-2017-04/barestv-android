@@ -67,27 +67,9 @@ public class activity_tabs extends AppCompatActivity {
         }
         mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
-//        Intent i = new Intent(this, resultTest.class);
-//        i.putExtra("ClitenteRest",clienteRest);
-//        startActivityForResult(i, 1);
 
     }
 
-
-//    @Override
-//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-//        super.onActivityResult(requestCode,resultCode,data);
-//        int res = 0;
-//        if (resultCode == RESULT_OK) {
-//            res=1;
-//            if (data.hasExtra("Tab")) {
-//                mViewPager.setCurrentItem(3);
-//            }
-//            if(data.hasExtra("FiltroCategoria")){
-//                busquedaFragment.aplicarFiltroCategoria(data.getStringExtra("FiltroCategoria"));
-//            }
-//        }
-//    }
 
 
 

@@ -114,7 +114,9 @@ public class FiltrosActivity extends AppCompatActivity {
             hayFecha=false;
         }
         if(hayFecha){
-            data.putExtra("FiltroFecha",ultimaFecha);
+            data.putExtra("FiltroFechaDia",ultimaFecha.get(Calendar.DAY_OF_MONTH));
+            data.putExtra("FiltroFechaMes",ultimaFecha.get(Calendar.MONTH));
+            data.putExtra("FiltroFechaAño",ultimaFecha.get(Calendar.YEAR));
         }
         if(hayCategoria){
             data.putExtra("FiltroCategoria",((TextView) ultimaCategoria.findViewById(R.id.cat)).getText());

@@ -146,8 +146,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Comedia");
             programa.put("Bar", "Dantis");
             programa.put("Descr", "Programa de humor presentado por Jose Mota");
-            programa.put("Inicio", "4/3/2017 21:00");
-            programa.put("Fin", "4/3/2017 24:00");
+            programa.put("Inicio", "4/03/2017 21:00");
+            programa.put("Fin", "4/03/2017 24:00");
             programas.add(programa);
         }
 

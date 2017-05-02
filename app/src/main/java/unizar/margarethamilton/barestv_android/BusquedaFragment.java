@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.SearchView;
@@ -19,6 +20,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 
@@ -41,7 +43,14 @@ public class BusquedaFragment extends Fragment {
     private Toolbar mToolbar;
     private ListView mList;
     private boolean hayBusqueda = false;
+    private boolean hayFiltro = false;
+    private boolean hayFiltroFecha = false;
+    private String ultimaBusqueda = "";
     private String filtroCategoria="";
+
+    private int filtroFechaDia;
+    private int filtroFechaMes;
+    private int filtroFechaAño;
 
     private OnFragmentInteractionListener mListener;
     private static ClienteRest clienteRest;
@@ -167,28 +176,30 @@ public class BusquedaFragment extends Fragment {
         //TODO: Se llama a la API para que devuelva la programacion proxima
         // Obtiene del BD remoto las programaciones destacadas
         List<HashMap<String, String>> programacion = clienteRest.getProgramacion();
-
+        hayBusqueda=false;
         // Crear un array donde se especifica los datos que se quiere mostrar
         String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
 
         // Crear un array done sse especifica los campos de ListView que se quiere rellenar
         int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                 R.id.inicio, R.id.fin};
-        if(!filtroCategoria.isEmpty()) {
-            List<HashMap<String, String>> programacionFiltrada =new ArrayList<HashMap<String, String>>();
-            for(HashMap<String,String> e:programacion){
-                if(e.containsValue(filtroCategoria)){
-                    programacionFiltrada.add(e);
+        ListHashAdapter res = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                programacion, from, to);
+        if(hayFiltro){
+            quitarFiltros();
+            List<HashMap<String, String>> programacionFiltrada = new ArrayList<HashMap<String, String>>();
+            if(!filtroCategoria.isEmpty()) {
+                for (HashMap<String, String> e : programacion) {
+                    if (e.containsValue(filtroCategoria)) {
+                        programacionFiltrada.add(e);
+                    }
                 }
+                // Configurar el adapter
+                res =  new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                        programacionFiltrada, from, to);
             }
-            // Configurar el adapter
-            return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
-                    programacionFiltrada, from, to);
-
-        }else{
-            return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
-                    programacion, from, to);
         }
+        return res;
     }
 
 
@@ -199,11 +210,40 @@ public class BusquedaFragment extends Fragment {
 
         int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                 R.id.inicio, R.id.fin};
-
-        return new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+        hayBusqueda=true;
+        ultimaBusqueda=query;
+        ListHashAdapter res = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
                 programacion, from, to);
+        if(hayFiltro){
+            quitarFiltros();
+            List<HashMap<String, String>> programacionFiltrada = new ArrayList<HashMap<String, String>>();
+            if(!filtroCategoria.isEmpty()) {
+                for (HashMap<String, String> e : programacion) {
+                    if (e.containsValue(filtroCategoria)) {
+                        programacionFiltrada.add(e);
+                    }
+                }
+                // Configurar el adapter
+                res = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                        programacionFiltrada, from, to);
+            }else if(hayFiltroFecha){
+                if(programacionFiltrada.isEmpty()){
+                    programacionFiltrada=programacion;
+                }
+                List<HashMap<String, String>> programacionFiltrada2 = new ArrayList<HashMap<String, String>>();
+                for (HashMap<String, String> e : programacionFiltrada) {
+                    if (e.containsValue(String.valueOf(filtroFechaDia)+"/"+
+                                        String.valueOf(filtroFechaMes)+"/"+
+                                        String.valueOf(filtroFechaAño))) {
+                        programacionFiltrada2.add(e);
+                    }
+                }
+                res = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
+                        programacionFiltrada2, from, to);
+            }
 
-
+        }
+        return res;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -212,16 +252,48 @@ public class BusquedaFragment extends Fragment {
             mListener.onFragmentInteraction(uri);
         }
     }
-/*Aplica el filtro de categoria a la programacion resultado*/
-    public void aplicarFiltroCategoria(String categoria){
-        filtroCategoria=categoria;
-        ArrayAdapter adapter = progProx();
+
+    public void quitarFiltros(){
+        Snackbar snackbar = Snackbar
+                .make(mList, "Filtros Activos", Snackbar.LENGTH_LONG)
+                .setAction("Quitar Filtros", new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Snackbar snackbar1 = Snackbar.make(getView(), "Filtros eliminados", Snackbar.LENGTH_SHORT);
+                        snackbar1.show();
+                        hayFiltro=false;
+                        hayFiltroFecha=false;
+                        filtroCategoria="";
+                        if(hayBusqueda){
+                            mList.setAdapter(busqueda(ultimaBusqueda));
+                        }else {
+                            mList.setAdapter(progProx());
+                        }
+                    }
+                });
+        snackbar.setDuration(Snackbar.LENGTH_INDEFINITE);
+        snackbar.show();
+    }
+/*Aplica el filtros a la programacion resultado*/
+    public void aplicarFiltros(String categoria, int dia, int mes, int año){
+        if(!categoria.isEmpty()) {
+            filtroCategoria = categoria;
+        }
+        if(dia!=0){
+            hayFiltroFecha=true;
+            filtroFechaDia=dia;
+            filtroFechaMes=mes;
+            filtroFechaAño=año;
+        }
+        ArrayAdapter adapter;
+        if(hayBusqueda){
+             adapter = busqueda(ultimaBusqueda);
+        }else {
+             adapter = progProx();
+        }
         mList.setAdapter(adapter);
     }
 
-    public void aplicarFiltroFecha(String categoria){
-
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -267,8 +339,17 @@ public class BusquedaFragment extends Fragment {
 //            if (data.hasExtra("Tab")) {
 //                mViewPager.setCurrentItem(3);
 //            }
+
             if(data.hasExtra("FiltroCategoria")){
-               aplicarFiltroCategoria(data.getStringExtra("FiltroCategoria"));
+                hayFiltro=true;
+               aplicarFiltros(data.getStringExtra("FiltroCategoria"),data.getIntExtra("FiltroFechaDia",0),
+                                data.getIntExtra("FiltroFechaMes",0),
+                                data.getIntExtra("FiltroFechaAño",0));
+            }else{
+                hayFiltro=true;
+                aplicarFiltros("",data.getIntExtra("FiltroFechaDia",0),
+                        data.getIntExtra("FiltroFechaMes",0),
+                        data.getIntExtra("FiltroFechaAño",0));
             }
     }
 }
