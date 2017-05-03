@@ -95,8 +95,8 @@ public class activity_tabs extends AppCompatActivity {
                     return  busquedaFragment;
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
-                case 3:
-                    //return  new MapaFragment();
+                //case 3: -- Solo utilizar cuando los mapas estén implementados
+                    //return  new MapaFragment(); -- Solo utilizar cuando los mapas estén implementados
             }
             return null;
             //return PlaceholderFragment.newInstance(position + 1);
@@ -105,7 +105,8 @@ public class activity_tabs extends AppCompatActivity {
         @Override
         public int getCount() {
             // Show 3 total pages.
-            return 4;
+            //return 4; -- Solo utilizar cuando los mapas estén implementados
+            return 3;
         }
 
         @Override
