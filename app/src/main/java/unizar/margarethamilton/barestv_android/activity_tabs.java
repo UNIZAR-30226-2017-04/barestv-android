@@ -96,7 +96,7 @@ public class activity_tabs extends AppCompatActivity {
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
                 case 3:
-                    return  new MapaFragment();
+                    //return  new MapaFragment();
             }
             return null;
             //return PlaceholderFragment.newInstance(position + 1);
