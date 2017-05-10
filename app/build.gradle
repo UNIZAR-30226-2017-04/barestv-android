@@ -34,6 +34,6 @@ dependencies {
     compile 'com.squareup.retrofit2:retrofit:2.2.0'
     compile 'com.github.hotchemi:permissionsdispatcher:2.2.0'
     apt 'com.github.hotchemi:permissionsdispatcher-processor:2.2.0'
-    compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
+    //compile group: 'javax.xml.bind', name: 'jaxb-api', version: '2.1'
     testCompile 'junit:junit:4.12'
 }
