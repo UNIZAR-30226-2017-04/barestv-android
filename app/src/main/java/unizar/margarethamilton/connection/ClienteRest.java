@@ -36,7 +36,7 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 public class ClienteRest implements Serializable {
 
-    private static final String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
+    private static final String URI = "http://localhost:8080/baresTvServicio/rest/server/";
 
     public List<HashMap<String, String>> getBares() {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
@@ -69,26 +69,91 @@ public class ClienteRest implements Serializable {
         return bares;
     }
 
-    /**
-     * @param nickbar
-     * @return diccionario con los detalles de un bar con nick nickbar; estará
-     *         vacío si el nick no corresponde a ningún bar
-     */
-    public HashMap<String, String> getBarDadoNick(String nickbar) {
-        HashMap<String, String> bar = new HashMap<String, String>();
-        return bar;
+    private interface Categorias {
+        @GET("categorias")
+        Call<ResponseBody> categorias();
     }
-
     /**
      * @return lista de todas las categorías existentes
      */
-    public List<String> getCategorias() {
-        List<String> cats = new ArrayList<String>();
+    public List<HashMap<String, String>> getCategorias() {
+        List<HashMap<String, String>> categorias = new ArrayList<HashMap<String, String>>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        Categorias clase = retrofit.create(Categorias.class);
+        Call<ResponseBody> call = clase.categorias();
+        try {
+            String response = call.execute().body().string();
 
-        cats.add("toros");
-        cats.add("fútbol");
+            JSONArray array = new JSONArray(response);
+            JSONObject obj = null;
 
-        return cats;
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    categorias.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
+        }
+
+        call.cancel();
+
+        return categorias;
+    }
+
+
+    private interface ProgramacionProxima {
+        @GET("programacion")
+        Call<ResponseBody> programacionProxima();
+    }
+
+    /**
+     * @return lista de diccionarios de todos los programas presentes o futuros
+     *         y sus detalles ordenados de más próximos a más lejanos en el tiempo
+     */
+    public List<HashMap<String, String>> getProgramacionProxima() {
+        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        ProgramacionProxima clase = retrofit.create(ProgramacionProxima.class);
+        Call<ResponseBody> call = clase.programacionProxima();
+        try {
+            String response = call.execute().body().string();
+
+            JSONArray array = new JSONArray(response);
+            JSONObject obj = null;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
+        }
+
+        call.cancel();
+
+        return programas;
     }
 
     /**
@@ -183,10 +248,10 @@ public class ClienteRest implements Serializable {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI)
                 .build();
-        ProgramacionDestacado pd = retrofit.create(ProgramacionDestacado.class);
-        Call<ResponseBody> pds = pd.programacionDestacado();
+        ProgramacionDestacado clase = retrofit.create(ProgramacionDestacado.class);
+        Call<ResponseBody> call = clase.programacionDestacado();
         try {
-            String response = pds.execute().body().string();
+            String response = call.execute().body().string();
 
             JSONArray array = new JSONArray(response);
             JSONObject obj = null;
@@ -210,7 +275,7 @@ public class ClienteRest implements Serializable {
             return null;
         }
 
-        pds.cancel();
+        call.cancel();
 
         return programas;
     }
@@ -296,107 +361,4 @@ public class ClienteRest implements Serializable {
 //        return programas;
 //    }
 
-
-    /**
-     * @return lista de diccionarios de todos los usuarios registrados y sus
-     *         detalles ordenados alfabéticamente (a-z) por nick
-     */
-    public List<HashMap<String, String>> getUsuarios() {
-        List<HashMap<String, String>> usuarios = new ArrayList<HashMap<String, String>>();
-        return usuarios;
-    }
-
-    /**
-     * @param nick
-     * @param clave nueva contraseña
-     * @param permisos 0 = usuario limitado; 1 = administrador
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean setUsuario(String nick, String clave, Boolean permisos) {
-        return false;
-    }
-
-    /**
-     * @param nickbar
-     * @param nombre
-     * @param descrbar
-     * @param activado 0 = deshabilitado; 1 = habilitado
-     * @param lat
-     * @param lng
-     * @param direccion
-     * @param urlimagen
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean setBar(String nickbar, String nombre,
-                          String descrbar, Boolean activado,
-                          String lat, String lng,
-                          String direccion, String urlimagen) {
-        return false;
-    }
-
-    /**
-     *
-     * @param titulo
-     * @param bar
-     * @param descr
-     * @param destacado 0 = no; 1 = sí
-     * @param inicio
-     * @param fin
-     * @param cat
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean setPrograma(String titulo, String bar,
-                               String descr, Boolean destacado,
-                               String inicio, String fin,
-                               String cat) {
-        return false;
-    }
-
-    /**
-     * Renombra una categoría.
-     * @param viejaCat
-     * @param nuevaCat
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean renombrarCategoria(String viejaCat, String nuevaCat) {
-        return false;
-    }
-
-    /**
-     * Crea una categoría.
-     * @param cat
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean crearCategoria(String cat) {
-        return false;
-    }
-
-    /**
-     * Borra una categoría.
-     * @param cat
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean borrarCategoria(String cat) {
-        return false;
-    }
-
-    /**
-     * Borra un usuario. En caso de ser un bar, borra también
-     * el establecimiento como tal con toda su información.
-     * @param nick
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean borrarUsuario(String nick) {
-        return false;
-    }
-
-    /**
-     * Borra un programa.
-     * @param titulo
-     * @param bar
-     * @return true si todo ha ido bien, falso en caso contrario
-     */
-    public Boolean borrarPrograma(String titulo, String bar) {
-        return false;
-    }
 }
