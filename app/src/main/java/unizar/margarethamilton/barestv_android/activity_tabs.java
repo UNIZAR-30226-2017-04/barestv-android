@@ -97,7 +97,7 @@ public class activity_tabs extends AppCompatActivity {
                     busquedaFragment=BusquedaFragment.newInstance(clienteRest);
                     return  busquedaFragment;
                 case 2:
-                    return  FavoritosFragment.newInstance("par1", String.valueOf(position));
+                    return  FavoritosFragment.newInstance(clienteRest);
                 case 3: // Solo utilizar cuando los mapas estén implementados
                     return  MapaFragment.newInstance(); // Solo utilizar cuando los mapas estén implementados
             }

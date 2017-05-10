@@ -24,12 +24,12 @@ public class FavoritosDbAdapter {
     /**
      * Columnas de la tabla favoritos
      */
-    public static final String KEY_BAR = "bar";
-    public static final String KEY_TITULO = "titulo";
-    public static final String KEY_DESCR = "descr";
-    public static final String KEY_INICIO = "inicio";
-    public static final String KEY_FIN = "fin";
-    public static final String KEY_CAT = "cat";
+    public static final String KEY_BAR = "Bar";
+    public static final String KEY_TITULO = "Titulo";
+    public static final String KEY_DESCR = "Descr";
+    public static final String KEY_INICIO = "Inicio";
+    public static final String KEY_FIN = "Fin";
+    public static final String KEY_CAT = "Categoria";
 
     /**
      * Tags para depuración
@@ -42,9 +42,10 @@ public class FavoritosDbAdapter {
      * Database creation sql statement
      */
     private static final String DATABASE_CREATE =
-            "create table notes (titulo text not null, "
-                    + "bar text not null, descr text not null, inicio text not null," +
-                    "fin text not null, cat text not null,PRIMARY KEY (titulo, bar));";
+            "create table favoritos ("+KEY_TITULO+ " text not null, "
+                    + KEY_BAR + " text not null, "+KEY_DESCR+" text not null, " +
+                    KEY_INICIO + " text not null," + KEY_FIN +" text not null, "+ KEY_CAT +
+                    " text not null,PRIMARY KEY (titulo, bar));";
 
     private static final String DATABASE_NAME = "data";
     private static final String DATABASE_TABLE = "favoritos";
@@ -170,7 +171,7 @@ public class FavoritosDbAdapter {
      */
     public Cursor ExtraerFavoritos() {
 
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO,
+        return mDb.query(DATABASE_TABLE, new String[] {"rowid _id", KEY_TITULO,
                 KEY_BAR, KEY_DESCR, KEY_INICIO, KEY_FIN, KEY_CAT}, null, null, null, null, KEY_BAR);
     }
 

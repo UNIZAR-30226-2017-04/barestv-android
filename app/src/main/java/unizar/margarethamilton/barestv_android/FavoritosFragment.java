@@ -1,12 +1,26 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
+
+import java.util.HashMap;
+import java.util.List;
+
+import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
+import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 
 
 /**
@@ -18,16 +32,19 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class FavoritosFragment extends Fragment {
-    // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM1 = "clientRest";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private DestacadoFragment.OnFragmentInteractionListener mListener;
+    private ClienteRest clienteRest;
+    private View view ;
+    private ListView mList;
+    private SwipeRefreshLayout swipeRefreshLayout;
+    private Snackbar snackbar = null;
+
+    private FavoritosDbAdapter mDbHelper; // Acceso a BBDD
+
 
     public FavoritosFragment() {
         // Required empty public constructor
@@ -37,17 +54,15 @@ public class FavoritosFragment extends Fragment {
      * Use this factory method to create a new instance of
      * this fragment using the provided parameters.
      *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment PlantillaFragment.
+     * @param _clienteRest API para conectar a la BBDD remota.
+     * @return A new instance of fragment DestacadoFragment.
      */
-    // TODO: Rename and change types and number of parameters
-    public static FavoritosFragment newInstance(String param1, String param2) {
+    public static FavoritosFragment newInstance(ClienteRest _clienteRest) {
         FavoritosFragment fragment = new FavoritosFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putSerializable(ARG_PARAM1, _clienteRest);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -55,17 +70,39 @@ public class FavoritosFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
+            clienteRest = (ClienteRest) getArguments().getSerializable(ARG_PARAM1);
         }
+        setRetainInstance(true);
+        mDbHelper = new FavoritosDbAdapter(this.getActivity());
+        mDbHelper.open();
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.favoritos_fragment_layout, container, false);
+        view = inflater.inflate(R.layout.favoritos_fragment_layout, container, false);
+
+        mList = (ListView) view.findViewById(R.id.list);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
+        swipeRefreshLayout.setRefreshing(true);
+
+        new FavoritosFragment.SetFavoritosTask().execute();
+
+        swipeRefreshLayout.setOnRefreshListener(
+                new SwipeRefreshLayout.OnRefreshListener() {
+                    @Override
+                    public void onRefresh() {
+                        // This method performs the actual data-refresh operation.
+                        // The method calls setRefreshing(false) when it's finished.
+                        new FavoritosFragment.SetFavoritosTask().execute();
+
+                    }
+                }
+        );
+        return view;
     }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -105,4 +142,80 @@ public class FavoritosFragment extends Fragment {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+
+    /**
+     * Rellena el listview con datods dados por el API de forma asincrona
+     */
+    private class SetFavoritosTask extends AsyncTask<Void, Void, ArrayAdapter> {
+
+        /**
+         * Comunicacion asincrona
+         * @param e
+         * @return
+         */
+        protected ArrayAdapter doInBackground(Void... e) {
+
+            // Eliminamos el snackbar anterior si no esta elinimado
+            if (snackbar != null) snackbar.dismiss();
+
+            // Obtiene del BBDD remoto las programaciones destacadas
+            List<HashMap<String, String>> programacion = clienteRest.getFavoritos(mDbHelper);
+
+            // Si no se ha podido establecer la conexion
+            if (programacion == null) return null;
+
+            // Crear un array donde se especifica los datos que se quiere mostrar
+            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+
+            // Crear un array donde se especifica los campos de ListView que se quiere rellenar
+            int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
+                    R.id.inicio, R.id.fin};
+
+            // Configurar el adapter
+            ArrayAdapter adapter = new ListHashAdapter(FavoritosFragment.this.getActivity(),
+                    R.layout.favoritos_listview_content, programacion, from, to);
+
+            return adapter;
+        }
+
+        /**
+         * Una vez obtenido los datos, se rellena el listview
+         * @param adapter
+         */
+        protected void onPostExecute(ArrayAdapter adapter) {
+            if (adapter == null) {
+                try {
+
+                    mDbHelper.introducirFavoritos("titulo", "bar", "desc", "inicio", "fin", "cat");
+                    // Obtiene del BBDD remoto las programaciones destacadas
+                    Cursor programacion = mDbHelper.ExtraerFavoritos();
+
+                    // Crear un array donde se especifica los datos que se quiere mostrar
+                    String[] from = new String[] { "Titulo", "Bar", "Descr", "Inicio", "Fin", "Categoria"};
+
+                    // Crear un array donde se especifica los campos de ListView que se quiere rellenar
+                    int[] to = new int[] { R.id.titulo , R.id.bar, R.id.descr,
+                            R.id.inicio, R.id.fin , R.id.categoria};
+
+                    // Configurar el adapter
+                    SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(
+                            FavoritosFragment.this.getActivity(), R.layout.favoritos_listview_content,
+                            programacion, from, to, 0);
+                    mList.setAdapter(cursorAdapter);
+                    // Mensaje error en caso de no poder conectar con la BBDD
+                    snackbar = Snackbar.make(view, R.string.error_conexion_favoritos,
+                            Snackbar.LENGTH_INDEFINITE).setAction("Action", null);
+                    snackbar.show();
+                    swipeRefreshLayout.setRefreshing(false);
+
+                } catch (Exception x) { x.printStackTrace();}
+            } else {
+                mList.setAdapter(adapter);
+                swipeRefreshLayout.setRefreshing(false);
+            }
+
+        }
+    }
+
 }

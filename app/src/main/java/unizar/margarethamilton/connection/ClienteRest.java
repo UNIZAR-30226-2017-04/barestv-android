@@ -8,6 +8,7 @@ import org.json.*;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,10 +24,6 @@ import retrofit2.http.Query;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 
 import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_BAR;
-import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_CAT;
-import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_DESCR;
-import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_FIN;
-import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_INICIO;
 import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 
@@ -36,7 +33,7 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 public class ClienteRest implements Serializable {
 
-    private static final String URI = "http://localhost:8080/baresTvServicio/rest/server/";
+    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
 
     public List<HashMap<String, String>> getBares() {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
@@ -252,7 +249,6 @@ public class ClienteRest implements Serializable {
         Call<ResponseBody> call = clase.programacionDestacado();
         try {
             String response = call.execute().body().string();
-
             JSONArray array = new JSONArray(response);
             JSONObject obj = null;
 
@@ -289,76 +285,79 @@ public class ClienteRest implements Serializable {
     /**
      * @return lista de diccionarios de todos los favoritos del usuario
      */
-//    public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
-//        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
-//        Retrofit retrofit = new Retrofit.Builder()
-//                .baseUrl(URI)
-//                .build();
-//       Favoritos f = retrofit.create(Favoritos.class);
-//
-//        List<Favorito> flist = new ArrayList<Favorito>();
-//        // Extrar favoritos del BBDD local
-//        Cursor cursor = mDb.ExtraerFavoritosAPI();
-//        try {
-//            while (cursor.moveToNext()) {
-//                flist.add(new Favorito(cursor.getString(cursor.getColumnIndex(KEY_TITULO)),
-//                        cursor.getString(cursor.getColumnIndex(KEY_BAR)),
-//                        cursor.getString(cursor.getColumnIndex(KEY_DESCR)),
-//                        cursor.getString(cursor.getColumnIndex(KEY_CAT)),
-//                        cursor.getString(cursor.getColumnIndex(KEY_INICIO)),
-//                        cursor.getString(cursor.getColumnIndex(KEY_FIN))
-//                        ));
-//            }
-//        } finally {
-//            cursor.close();
-//        }
-//
-//        String encoded = null;
-//        try {
-//            encoded = URLEncoder.encode(flist.toString(), "UTF-8");
-//        } catch (UnsupportedEncodingException e) {
-//            e.printStackTrace();
-//        }
-//
-//        Call<ResponseBody> fs = f.favoritos(encoded);
-//        try {
-//            String response = fs.execute().body().string();
-//
-//            // Actualizar BBDD local;
-//            mDb.EliminarTodosFavoritos();
-//
-//
-//            JSONArray array = new JSONArray(response);
-//            JSONObject obj = null;
-//
-//            for (int i=0; i < array.length(); i++) {
-//
-//                try {
-//                    HashMap<String, String> hmp = new HashMap<String, String>();
-//                    obj = array.getJSONObject(i);
-//
-//                    mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
-//                            obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
-//                            obj.getString("Fin"));
-//
-//                    hmp.put("Titulo", obj.getString("Titulo"));
-//                    hmp.put("Categoria", obj.getString("Cat"));
-//                    hmp.put("Bar", obj.getString("Bar"));
-//                    hmp.put("Descr", obj.getString("Descr"));
-//                    hmp.put("Inicio", obj.getString("Inicio"));
-//                    hmp.put("Fin", obj.getString("Fin"));
-//                    programas.add(hmp);
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                }}
-//        } catch (Exception e) {
-//            return null;
-//        }
-//
-//        fs.cancel();
-//
-//        return programas;
-//    }
+     public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
+         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+         Retrofit retrofit = new Retrofit.Builder()
+                  .baseUrl(URI)
+                  .build();
+         Favoritos f = retrofit.create(Favoritos.class);
+
+         JSONArray arrayIni = new JSONArray();
+
+         // Extrar favoritos del BBDD local
+         Cursor cursor = mDb.ExtraerFavoritosAPI();
+         try {
+             while (cursor.moveToNext()) {
+                 try {
+                     JSONObject obj = new JSONObject();
+                     obj.put("Titulo",cursor.getString(cursor.getColumnIndex(KEY_TITULO)));
+                     obj.put("Bar", cursor.getString(cursor.getColumnIndex(KEY_BAR)));
+                     arrayIni.put(obj);
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                 }
+              }
+         } finally {
+              cursor.close();
+         }
+
+         String encoded = null;
+         try {
+             encoded = URLEncoder.encode(arrayIni.toString(), "UTF-8");
+         } catch (UnsupportedEncodingException e) {
+             e.printStackTrace();
+         }
+
+         Call<ResponseBody> fs = f.favoritos(encoded);
+         try {
+             String response = fs.execute().body().string();
+
+             // Actualizar BBDD local;
+             mDb.EliminarTodosFavoritos();
+
+
+             JSONArray array = new JSONArray(response);
+             JSONObject obj = null;
+
+             for (int i=0; i < array.length(); i++) {
+
+                 try {
+                     HashMap<String, String> hmp = new HashMap<String, String>();
+                     obj = array.getJSONObject(i);
+
+                     mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
+                              obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
+                              obj.getString("Fin"));
+
+                     hmp.put("Titulo", obj.getString("Titulo"));
+                     hmp.put("Categoria", obj.getString("Cat"));
+                     hmp.put("Bar", obj.getString("Bar"));
+                     hmp.put("Descr", obj.getString("Descr"));
+                     hmp.put("Inicio", obj.getString("Inicio"));
+                     hmp.put("Fin", obj.getString("Fin"));
+                     programas.add(hmp);
+
+                 } catch (JSONException e) {
+                     e.printStackTrace();
+                 }
+             }
+         } catch (Exception e) {
+              return null;
+         }
+
+         fs.cancel();
+
+         return programas;
+     }
 
 }
