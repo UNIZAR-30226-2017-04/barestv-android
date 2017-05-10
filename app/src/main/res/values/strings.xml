@@ -15,4 +15,6 @@
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="error_conexion">No se ha podido establecer la conexion con la base de datos remota</string>
 
+    <string name="google_maps_api_key">AIzaSyBB5a4jGpahlPNP7-zup6RSWdJc1YU-09c</string>
+
 </resources>
