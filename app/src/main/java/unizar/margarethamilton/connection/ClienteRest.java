@@ -7,6 +7,8 @@ import org.json.*;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,7 +19,15 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.GET;
+import retrofit2.http.Query;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
+
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_BAR;
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_CAT;
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_DESCR;
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_FIN;
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_INICIO;
+import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 
 /**
@@ -207,8 +217,8 @@ public class ClienteRest implements Serializable {
 
 
     private interface Favoritos {
-        @GET("destacados")
-        Call<ResponseBody> programacionDestacado();
+        @GET("actualizar")
+        Call<ResponseBody> favoritos(@Query("lista") String lista);
     }
 
     /**
@@ -219,23 +229,53 @@ public class ClienteRest implements Serializable {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI)
                 .build();
-        ProgramacionDestacado pd = retrofit.create(ProgramacionDestacado.class);
+       Favoritos f = retrofit.create(Favoritos.class);
 
+        List<Favorito> flist = new ArrayList<Favorito>();
         // Extrar favoritos del BBDD local
         Cursor cursor = mDb.ExtraerFavoritosAPI();
-
-
-        Call<ResponseBody> pds = pd.programacionDestacado();
         try {
-            String response = pds.execute().body().string();
+            while (cursor.moveToNext()) {
+                flist.add(new Favorito(cursor.getString(cursor.getColumnIndex(KEY_TITULO)),
+                        cursor.getString(cursor.getColumnIndex(KEY_BAR)),
+                        cursor.getString(cursor.getColumnIndex(KEY_DESCR)),
+                        cursor.getString(cursor.getColumnIndex(KEY_CAT)),
+                        cursor.getString(cursor.getColumnIndex(KEY_INICIO)),
+                        cursor.getString(cursor.getColumnIndex(KEY_FIN))
+                        ));
+            }
+        } finally {
+            cursor.close();
+        }
+
+        String encoded = null;
+        try {
+            encoded = URLEncoder.encode(flist.toString(), "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        Call<ResponseBody> fs = f.favoritos(encoded);
+        try {
+            String response = fs.execute().body().string();
+
+            // Actualizar BBDD local;
+            mDb.EliminarTodosFavoritos();
+
 
             JSONArray array = new JSONArray(response);
             JSONObject obj = null;
 
             for (int i=0; i < array.length(); i++) {
+
                 try {
                     HashMap<String, String> hmp = new HashMap<String, String>();
                     obj = array.getJSONObject(i);
+
+                    mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
+                            obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
+                            obj.getString("Fin"));
+
                     hmp.put("Titulo", obj.getString("Titulo"));
                     hmp.put("Categoria", obj.getString("Cat"));
                     hmp.put("Bar", obj.getString("Bar"));
@@ -251,7 +291,7 @@ public class ClienteRest implements Serializable {
             return null;
         }
 
-        pds.cancel();
+        fs.cancel();
 
         return programas;
     }

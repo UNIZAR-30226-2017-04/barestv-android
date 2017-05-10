@@ -144,6 +144,15 @@ public class FavoritosDbAdapter {
     }
 
     /**
+     * Eliminar todos los favorito. Devuelve true en caso de
+     * eliminar con exito
+     * @return true en caso de eliminar con exito
+     */
+    public boolean EliminarTodosFavoritos() {
+        return mDb.delete(DATABASE_TABLE, null, null) > 0;
+    }
+
+    /**
      * Devuelve un cursor sobre todos los favoritos para el uso de la API
      *
      * @return Cursor sobre todos los favoritos
