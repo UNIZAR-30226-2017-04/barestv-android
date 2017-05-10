@@ -48,9 +48,9 @@ public class BusquedaFragment extends Fragment {
     private String ultimaBusqueda = "";
     private String filtroCategoria="";
 
-    private int filtroFechaDia;
-    private int filtroFechaMes;
-    private int filtroFechaAño;
+    private String filtroFechaDia;
+    private String filtroFechaMes;
+    private String filtroFechaAño;
 
     private OnFragmentInteractionListener mListener;
     private static ClienteRest clienteRest;
@@ -227,14 +227,24 @@ public class BusquedaFragment extends Fragment {
                 res = new ListHashAdapter(this.getActivity(), R.layout.destacado_listview_content,
                         programacionFiltrada, from, to);
             }else if(hayFiltroFecha){
+                List<HashMap<String, String>> programacionConFecha = new ArrayList<HashMap<String, String>>();
                 if(programacionFiltrada.isEmpty()){
                     programacionFiltrada=programacion;
                 }
-                List<HashMap<String, String>> programacionFiltrada2 = new ArrayList<HashMap<String, String>>();
                 for (HashMap<String, String> e : programacionFiltrada) {
-                    if (e.containsValue(String.valueOf(filtroFechaDia)+"/"+
-                                        String.valueOf(filtroFechaMes)+"/"+
-                                        String.valueOf(filtroFechaAño))) {
+                    String inicio=e.get("Inicio");
+                    String fin=e.get("Fin");
+                    String fechaInicio=inicio.split(" ")[0];
+                    String fechaFin=fin.split(" ")[0];
+                    e.put("FechaInicio",fechaInicio);
+                    e.put("FechaFin",fechaFin);
+                    programacionConFecha.add(e);
+                }
+                List<HashMap<String, String>> programacionFiltrada2 = new ArrayList<HashMap<String, String>>();
+                for (HashMap<String, String> e : programacionConFecha) {
+                    if (e.containsValue(filtroFechaAño+"-"+
+                                        filtroFechaMes+"-"+
+                            filtroFechaDia)) {
                         programacionFiltrada2.add(e);
                     }
                 }
@@ -281,9 +291,15 @@ public class BusquedaFragment extends Fragment {
         }
         if(dia!=0){
             hayFiltroFecha=true;
-            filtroFechaDia=dia;
-            filtroFechaMes=mes;
-            filtroFechaAño=año;
+            filtroFechaDia=String.valueOf(dia);
+            filtroFechaMes=String.valueOf(mes+1);
+            filtroFechaAño=String.valueOf(año);
+            if(dia<10){
+                filtroFechaDia="0"+filtroFechaDia;
+            }
+            if(mes<10){
+                filtroFechaMes="0"+filtroFechaMes;
+            }
         }
         ArrayAdapter adapter;
         if(hayBusqueda){

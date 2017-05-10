@@ -36,7 +36,7 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 public class ClienteRest implements Serializable {
 
-    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
+    private static final String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
 
     public List<HashMap<String, String>> getBares() {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
@@ -104,8 +104,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Entretenimiento");
             programa.put("Bar", "Taberna Kalandria");
             programa.put("Descr", "Programa el Hormiguero, presentado por Pablo Motos");
-            programa.put("Inicio", "4/3/2017 21:00");
-            programa.put("Fin", "4/3/2017 23:00");
+            programa.put("Inicio", "04/03/2017 21:00");
+            programa.put("Fin", "04/03/2017 23:00");
             programas.add(programa);
         }
 
@@ -115,8 +115,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Comedia");
             programa.put("Bar", "Dantis");
             programa.put("Descr", "Programa de humor presentado por Jose Mota");
-            programa.put("Inicio", "4/3/2017 21:00");
-            programa.put("Fin", "4/3/2017 24:00");
+            programa.put("Inicio", "04/03/2017 21:00");
+            programa.put("Fin", "04/03/2017 24:00");
             programas.add(programa);
         }
 
@@ -126,8 +126,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Deporte");
             programa.put("Bar", "Almendros");
             programa.put("Descr", "Jornada 12,Liga BBVA");
-            programa.put("Inicio", "5/3/2017 20:00");
-            programa.put("Fin", "5/3/2017 22:30");
+            programa.put("Inicio", "05/03/2017 20:00");
+            programa.put("Fin", "05/03/2017 22:30");
             programas.add(programa);
         }
 
@@ -137,8 +137,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Deporte");
             programa.put("Bar", "Bar Buenavista");
             programa.put("Descr", "Jornada 12,Liga BBVA");
-            programa.put("Inicio", "6/3/2017 17:00");
-            programa.put("Fin", "6/3/2017 19:30");
+            programa.put("Inicio", "06/03/2017 17:00");
+            programa.put("Fin", "06/03/2017 19:30");
             programas.add(programa);
         }
 
@@ -159,8 +159,8 @@ public class ClienteRest implements Serializable {
             programa.put("Categoria", "Comedia");
             programa.put("Bar", "Dantis");
             programa.put("Descr", "Programa de humor presentado por Jose Mota");
-            programa.put("Inicio", "4/03/2017 21:00");
-            programa.put("Fin", "4/03/2017 24:00");
+            programa.put("Inicio", "04/03/2017 21:00");
+            programa.put("Fin", "04/03/2017 24:00");
             programas.add(programa);
         }
 
@@ -224,77 +224,77 @@ public class ClienteRest implements Serializable {
     /**
      * @return lista de diccionarios de todos los favoritos del usuario
      */
-    public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
-        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl(URI)
-                .build();
-       Favoritos f = retrofit.create(Favoritos.class);
-
-        List<Favorito> flist = new ArrayList<Favorito>();
-        // Extrar favoritos del BBDD local
-        Cursor cursor = mDb.ExtraerFavoritosAPI();
-        try {
-            while (cursor.moveToNext()) {
-                flist.add(new Favorito(cursor.getString(cursor.getColumnIndex(KEY_TITULO)),
-                        cursor.getString(cursor.getColumnIndex(KEY_BAR)),
-                        cursor.getString(cursor.getColumnIndex(KEY_DESCR)),
-                        cursor.getString(cursor.getColumnIndex(KEY_CAT)),
-                        cursor.getString(cursor.getColumnIndex(KEY_INICIO)),
-                        cursor.getString(cursor.getColumnIndex(KEY_FIN))
-                        ));
-            }
-        } finally {
-            cursor.close();
-        }
-
-        String encoded = null;
-        try {
-            encoded = URLEncoder.encode(flist.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-
-        Call<ResponseBody> fs = f.favoritos(encoded);
-        try {
-            String response = fs.execute().body().string();
-
-            // Actualizar BBDD local;
-            mDb.EliminarTodosFavoritos();
-
-
-            JSONArray array = new JSONArray(response);
-            JSONObject obj = null;
-
-            for (int i=0; i < array.length(); i++) {
-
-                try {
-                    HashMap<String, String> hmp = new HashMap<String, String>();
-                    obj = array.getJSONObject(i);
-
-                    mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
-                            obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
-                            obj.getString("Fin"));
-
-                    hmp.put("Titulo", obj.getString("Titulo"));
-                    hmp.put("Categoria", obj.getString("Cat"));
-                    hmp.put("Bar", obj.getString("Bar"));
-                    hmp.put("Descr", obj.getString("Descr"));
-                    hmp.put("Inicio", obj.getString("Inicio"));
-                    hmp.put("Fin", obj.getString("Fin"));
-                    programas.add(hmp);
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }}
-        } catch (Exception e) {
-            return null;
-        }
-
-        fs.cancel();
-
-        return programas;
-    }
+//    public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
+//        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+//        Retrofit retrofit = new Retrofit.Builder()
+//                .baseUrl(URI)
+//                .build();
+//       Favoritos f = retrofit.create(Favoritos.class);
+//
+//        List<Favorito> flist = new ArrayList<Favorito>();
+//        // Extrar favoritos del BBDD local
+//        Cursor cursor = mDb.ExtraerFavoritosAPI();
+//        try {
+//            while (cursor.moveToNext()) {
+//                flist.add(new Favorito(cursor.getString(cursor.getColumnIndex(KEY_TITULO)),
+//                        cursor.getString(cursor.getColumnIndex(KEY_BAR)),
+//                        cursor.getString(cursor.getColumnIndex(KEY_DESCR)),
+//                        cursor.getString(cursor.getColumnIndex(KEY_CAT)),
+//                        cursor.getString(cursor.getColumnIndex(KEY_INICIO)),
+//                        cursor.getString(cursor.getColumnIndex(KEY_FIN))
+//                        ));
+//            }
+//        } finally {
+//            cursor.close();
+//        }
+//
+//        String encoded = null;
+//        try {
+//            encoded = URLEncoder.encode(flist.toString(), "UTF-8");
+//        } catch (UnsupportedEncodingException e) {
+//            e.printStackTrace();
+//        }
+//
+//        Call<ResponseBody> fs = f.favoritos(encoded);
+//        try {
+//            String response = fs.execute().body().string();
+//
+//            // Actualizar BBDD local;
+//            mDb.EliminarTodosFavoritos();
+//
+//
+//            JSONArray array = new JSONArray(response);
+//            JSONObject obj = null;
+//
+//            for (int i=0; i < array.length(); i++) {
+//
+//                try {
+//                    HashMap<String, String> hmp = new HashMap<String, String>();
+//                    obj = array.getJSONObject(i);
+//
+//                    mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
+//                            obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
+//                            obj.getString("Fin"));
+//
+//                    hmp.put("Titulo", obj.getString("Titulo"));
+//                    hmp.put("Categoria", obj.getString("Cat"));
+//                    hmp.put("Bar", obj.getString("Bar"));
+//                    hmp.put("Descr", obj.getString("Descr"));
+//                    hmp.put("Inicio", obj.getString("Inicio"));
+//                    hmp.put("Fin", obj.getString("Fin"));
+//                    programas.add(hmp);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }}
+//        } catch (Exception e) {
+//            return null;
+//        }
+//
+//        fs.cancel();
+//
+//        return programas;
+//    }
 
 
     /**
