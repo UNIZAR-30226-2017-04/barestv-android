@@ -47,6 +47,9 @@ public class activity_tabs extends AppCompatActivity {
     private ViewPager mViewPager;
     private ClienteRest clienteRest;
     private BusquedaFragment busquedaFragment;
+    private DestacadoFragment destacadoFragment;
+    private FavoritosFragment favoritosFragment;
+    private MapaFragment mapaFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,10 +74,21 @@ public class activity_tabs extends AppCompatActivity {
         }
         mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
+
+        destacadoFragment = DestacadoFragment.newInstance(clienteRest);
+        busquedaFragment = BusquedaFragment.newInstance(clienteRest);
+        favoritosFragment = FavoritosFragment.newInstance(clienteRest);
+        mapaFragment = MapaFragment.newInstance();
     }
 
 
+    public void destacadosClick (View v) {
+        destacadoFragment.destacadosClick(v);
+    }
 
+    public void favoritosClick (View v) {
+        favoritosFragment.favoritosClick(v);
+    }
 
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
@@ -92,14 +106,13 @@ public class activity_tabs extends AppCompatActivity {
             // Return a PlaceholderFragment (defined as a static inner class below).
             switch (position) {
                 case 0:
-                    return  DestacadoFragment.newInstance(clienteRest);
+                    return destacadoFragment;
                 case 1:
-                    busquedaFragment=BusquedaFragment.newInstance(clienteRest);
                     return  busquedaFragment;
                 case 2:
-                    return  FavoritosFragment.newInstance(clienteRest);
+                    return favoritosFragment;
                 case 3: // Solo utilizar cuando los mapas estén implementados
-                    return  MapaFragment.newInstance(); // Solo utilizar cuando los mapas estén implementados
+                    return mapaFragment; // Solo utilizar cuando los mapas estén implementados
             }
             return null;
             //return PlaceholderFragment.newInstance(position + 1);

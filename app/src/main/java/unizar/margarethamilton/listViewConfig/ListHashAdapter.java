@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.TextView;
 
 import java.util.HashMap;
@@ -62,7 +63,9 @@ public class ListHashAdapter extends ArrayAdapter {
 
         // Mapea los datos a los campos del ListView
         for (int i=0; i < from.length; i++) {
-            if (v[i] instanceof TextView) {
+             if (v[i] instanceof CheckBox) {
+                setCheckBox((CheckBox) v[i], entry.get(from[i]));
+            } else if (v[i] instanceof TextView) {
                 setViewText((TextView) v[i], entry.get(from[i]));
             }
 
@@ -78,5 +81,21 @@ public class ListHashAdapter extends ArrayAdapter {
      */
     public void setViewText(TextView v, String text) {
         v.setText(text);
+    }
+
+
+    /**
+     * Activar el checkbox dependiendo de la entrada
+     * @param v CheckBox que sera insertado
+     * @param activado indica si debe de estar activado
+     */
+    public void setCheckBox(CheckBox v, String activado) {
+        try {
+            if (new String("1").equals(activado)) {
+                v.setChecked(true);
+            } else {
+                v.setChecked(false);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
     }
 }

@@ -13,7 +13,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -103,6 +106,15 @@ public class FavoritosFragment extends Fragment {
         return view;
     }
 
+    public void favoritosClick (View v) {
+        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
+        TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
+        TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
+        mDbHelper.EliminarFavoritos(tituloV.getText().toString(), barV.getText().toString());
+        swipeRefreshLayout.setRefreshing(false);
+        new SetFavoritosTask().execute();
+    }
+
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -187,7 +199,6 @@ public class FavoritosFragment extends Fragment {
             if (adapter == null) {
                 try {
 
-                    mDbHelper.introducirFavoritos("titulo", "bar", "desc", "inicio", "fin", "cat");
                     // Obtiene del BBDD remoto las programaciones destacadas
                     Cursor programacion = mDbHelper.ExtraerFavoritos();
 

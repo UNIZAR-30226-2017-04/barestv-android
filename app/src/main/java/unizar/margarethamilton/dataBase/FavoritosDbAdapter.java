@@ -140,8 +140,9 @@ public class FavoritosDbAdapter {
      * @return true en caso de eliminar con exito
      */
     public boolean EliminarFavoritos(String titulo, String bar) {
-        return mDb.delete(DATABASE_TABLE, KEY_TITULO + "=" + titulo + "AND" +
-                KEY_BAR + "=" + bar, null) > 0;
+        String[] args = {titulo, bar};
+        return mDb.delete(DATABASE_TABLE, KEY_TITULO + "=?" + " AND " +
+                KEY_BAR + "=?", args) > 0;
     }
 
     /**
@@ -203,8 +204,22 @@ public class FavoritosDbAdapter {
         updateValues.put(KEY_FIN, fin);
         updateValues.put(KEY_CAT, cat);
 
-        return mDb.update(DATABASE_TABLE, updateValues, KEY_TITULO + "=" + tituloViejo + "AND" +
-                KEY_BAR + "=" + barViejo, null) > 0;
+        String[] args = {tituloViejo, barViejo};
+        return mDb.update(DATABASE_TABLE, updateValues, KEY_TITULO + "=?" + " AND " +
+                KEY_BAR + "=?", args) > 0;
+    }
+
+    /**
+     * Comprueba si existe el favorito con los datos proporcionados. Devuelve true en caso de que existe
+     * y falso en caso contrario
+     * @param titulo
+     * @param bar
+     * @return true en caso de que existe y falso en caso contrario
+     */
+    public Boolean comprobarFavorito(String titulo, String bar) {
+        String[] args = {titulo, bar};
+        return mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO}, KEY_TITULO + "=?" +
+                     " AND " + KEY_BAR + "=?", args, null, null, null, null).getCount()>0;
     }
 }
 

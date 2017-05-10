@@ -1,8 +1,6 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
-import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,14 +9,19 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.view.ViewGroup;
+import android.widget.CheckBox;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
 
 import java.util.HashMap;
 import java.util.List;
 
 import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 
 /**
@@ -40,7 +43,7 @@ public class DestacadoFragment extends Fragment {
     private ListView mList;
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar = null;
-
+    private FavoritosDbAdapter mDbHelper; // Acceso a BBDD
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -69,6 +72,8 @@ public class DestacadoFragment extends Fragment {
             clienteRest = (ClienteRest) getArguments().getSerializable(ARG_PARAM1);
         }
         setRetainInstance(true);
+        mDbHelper = new FavoritosDbAdapter(this.getActivity());
+        mDbHelper.open();
     }
 
     @Override
@@ -94,9 +99,36 @@ public class DestacadoFragment extends Fragment {
                     }
                 }
         );
+
+
         return view;
     }
 
+    public void destacadosClick (View v) {
+        RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
+        CheckBox favoritoV = (CheckBox) vwParentRow.findViewById(R.id.favCheck);
+        if (favoritoV.isChecked()) {
+
+            TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
+            TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
+            TextView descrV = (TextView) vwParentRow.findViewById(R.id.descr);
+            TextView catV = (TextView) vwParentRow.findViewById(R.id.categoria);
+            TextView inicioV = (TextView) vwParentRow.findViewById(R.id.inicio);
+            TextView finV = (TextView) vwParentRow.findViewById(R.id.fin);
+
+            try {
+                mDbHelper.introducirFavoritos(tituloV.getText().toString(), barV.getText().toString(),
+                        descrV.getText().toString(), inicioV.getText().toString(),
+                        finV.getText().toString(), catV.getText().toString());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
+            TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
+            mDbHelper.EliminarFavoritos(tituloV.getText().toString(), barV.getText().toString());
+        }
+    }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
@@ -145,8 +177,8 @@ public class DestacadoFragment extends Fragment {
 
         /**
          * Comunicacion asincrona
-         * @param e
-         * @return
+         * @param e void
+         * @return ArrayAdapter
          */
         protected ArrayAdapter doInBackground(Void... e) {
 
@@ -159,12 +191,24 @@ public class DestacadoFragment extends Fragment {
             // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
 
+            String titulo;
+            String bar;
+            for (int i = 0; i < programacion.size(); i++) {
+                titulo = programacion.get(i).get("Titulo");
+                bar = programacion.get(i).get("Bar");
+                if (mDbHelper.comprobarFavorito(titulo,bar)) {
+                    programacion.get(i).put("CheckBox", "1");
+                } else {
+                    programacion.get(i).put("CheckBox", "0");
+                }
+            }
+
             // Crear un array donde se especifica los datos que se quiere mostrar
-            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin", "CheckBox"};
 
             // Crear un array donde se especifica los campos de ListView que se quiere rellenar
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
-                    R.id.inicio, R.id.fin};
+                    R.id.inicio, R.id.fin, R.id.favCheck};
 
             // Configurar el adapter
             ArrayAdapter adapter = new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
@@ -184,7 +228,7 @@ public class DestacadoFragment extends Fragment {
                     snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
                             .setAction("Action", null);
                     snackbar.show();
-                } catch (Exception x) {}
+                } catch (Exception x) { x.printStackTrace();}
                 swipeRefreshLayout.setRefreshing(false);
             } else {
                 mList.setAdapter(adapter);
