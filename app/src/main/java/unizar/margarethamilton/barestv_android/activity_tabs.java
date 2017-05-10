@@ -1,10 +1,14 @@
 package unizar.margarethamilton.barestv_android;
 
+import android.Manifest;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.support.annotation.NonNull;
 import android.support.design.widget.TabLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
@@ -67,7 +71,6 @@ public class activity_tabs extends AppCompatActivity {
         }
         mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
-
     }
 
 
@@ -95,8 +98,8 @@ public class activity_tabs extends AppCompatActivity {
                     return  busquedaFragment;
                 case 2:
                     return  FavoritosFragment.newInstance("par1", String.valueOf(position));
-                //case 3: -- Solo utilizar cuando los mapas estén implementados
-                    //return  new MapaFragment(); -- Solo utilizar cuando los mapas estén implementados
+                case 3: // Solo utilizar cuando los mapas estén implementados
+                    return  MapaFragment.newInstance(); // Solo utilizar cuando los mapas estén implementados
             }
             return null;
             //return PlaceholderFragment.newInstance(position + 1);
@@ -106,7 +109,7 @@ public class activity_tabs extends AppCompatActivity {
         public int getCount() {
             // Show 3 total pages.
             //return 4; -- Solo utilizar cuando los mapas estén implementados
-            return 3;
+            return 4;
         }
 
         @Override
@@ -130,5 +133,4 @@ public class activity_tabs extends AppCompatActivity {
             return tab;
         }
     }
-
 }
