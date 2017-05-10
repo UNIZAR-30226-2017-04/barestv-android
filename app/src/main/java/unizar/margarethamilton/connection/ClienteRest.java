@@ -1,5 +1,7 @@
 package unizar.margarethamilton.connection;
 
+import android.database.Cursor;
+
 import org.json.*;
 
 
@@ -15,6 +17,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.GET;
+import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 
 
 /**
@@ -201,6 +204,58 @@ public class ClienteRest implements Serializable {
 
         return programas;
     }
+
+
+    private interface Favoritos {
+        @GET("destacados")
+        Call<ResponseBody> programacionDestacado();
+    }
+
+    /**
+     * @return lista de diccionarios de todos los favoritos del usuario
+     */
+    public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
+        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        ProgramacionDestacado pd = retrofit.create(ProgramacionDestacado.class);
+
+        // Extrar favoritos del BBDD local
+        Cursor cursor = mDb.ExtraerFavoritosAPI();
+
+
+        Call<ResponseBody> pds = pd.programacionDestacado();
+        try {
+            String response = pds.execute().body().string();
+
+            JSONArray array = new JSONArray(response);
+            JSONObject obj = null;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
+        }
+
+        pds.cancel();
+
+        return programas;
+    }
+
 
     /**
      * @return lista de diccionarios de todos los usuarios registrados y sus
