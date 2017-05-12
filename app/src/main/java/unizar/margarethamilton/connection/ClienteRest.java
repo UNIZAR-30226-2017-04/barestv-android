@@ -428,7 +428,6 @@ public class ClienteRest implements Serializable {
              // Actualizar BBDD local;
              mDb.EliminarTodosFavoritos();
 
-
              JSONArray array = new JSONArray(response);
              JSONObject obj;
 
@@ -438,7 +437,6 @@ public class ClienteRest implements Serializable {
                      HashMap<String, String> hmp = new HashMap<String, String>();
                      obj = array.getJSONObject(i);
 
-                     android.util.Log.d("TAAG", obj.getString("Titulo"));
                      mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Bar"),
                               obj.getString("Descr"), obj.getString("Inicio"),
                               obj.getString("Fin"),obj.getString("Cat"));
