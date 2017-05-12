@@ -400,7 +400,7 @@ public class ClienteRest implements Serializable {
          Retrofit retrofit = new Retrofit.Builder()
                   .baseUrl(URI)
                   .build();
-         Favoritos clase = retrofit.create(Favoritos.class);
+
 
          // Preparar parametros a pasar
          JSONArray arrayIni = new JSONArray();
@@ -419,15 +419,8 @@ public class ClienteRest implements Serializable {
              }
          }
 
-         // Codificar la peticion para eliminar errores con ":" y "&"
-         String encoded = null;
-         try {
-             encoded = URLEncoder.encode(arrayIni.toString(), "UTF-8");
-         } catch (UnsupportedEncodingException e) {
-             e.printStackTrace();
-         }
-
-         Call<ResponseBody> call = clase.favoritos(encoded);
+         Favoritos clase = retrofit.create(Favoritos.class);
+         Call<ResponseBody> call = clase.favoritos(arrayIni.toString());
          try {
              // Obtener respuesta
              String response = call.execute().body().string();
@@ -445,9 +438,10 @@ public class ClienteRest implements Serializable {
                      HashMap<String, String> hmp = new HashMap<String, String>();
                      obj = array.getJSONObject(i);
 
-                     mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Cat"),
-                              obj.getString("Bar"), obj.getString("Descr"), obj.getString("Inicio"),
-                              obj.getString("Fin"));
+                     android.util.Log.d("TAAG", obj.getString("Titulo"));
+                     mDb.introducirFavoritos(obj.getString("Titulo"), obj.getString("Bar"),
+                              obj.getString("Descr"), obj.getString("Inicio"),
+                              obj.getString("Fin"),obj.getString("Cat"));
 
                      hmp.put("Titulo", obj.getString("Titulo"));
                      hmp.put("Categoria", obj.getString("Cat"));
@@ -462,6 +456,7 @@ public class ClienteRest implements Serializable {
                  }
              }
          } catch (Exception e) {
+             e.printStackTrace();
               return null;
          }
 
