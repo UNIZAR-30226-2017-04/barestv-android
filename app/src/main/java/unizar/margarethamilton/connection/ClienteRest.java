@@ -4,11 +4,8 @@ import android.database.Cursor;
 
 import org.json.*;
 
-
-import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -16,8 +13,6 @@ import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
@@ -27,70 +22,97 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_BAR;
 import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 
-/**
- * Created by Xian on 2017/4/10.
- */
-
 public class ClienteRest implements Serializable {
 
     private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
 
-    public List<HashMap<String, String>> getBares() {
+    /**
+     * `Peticion HTTP para funcion getBares()
+     */
+    private interface Bares {
+        @GET("bar")
+        Call<ResponseBody> bares(@Query("lat") int lat, @Query("lng") int lng,
+                                 @Query("radio") int radio);
+    }
+
+    /**
+     * Obtener lista de diccionarios los bares cercanos dado los parametros
+     * @param lat latitud
+     * @param lng longitud
+     * @param radio radio de cercania
+     * @return lista de diccionarios de todos los bares cercanos
+     */
+    public List<HashMap<String, String>> getBares(int lat, int lng, int radio) {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
 
-        {
-            HashMap<String, String> bar = new HashMap<String, String>();
-            bar.put("nickbar", "bardeprueba");
-            bar.put("nombre", "Bar de Manolo");
-            bar.put("descrbar", "Las peores tapas, más caras que nunca.");
-            bar.put("activado", "1");
-            bar.put("lat", "41.65111400");
-            bar.put("lng", "-0.89438000");
-            bar.put("direccion", "Calle La Mala Muerte");
-            bar.put("urlimagen", "https://encrypted.google.com/images/branding/googlelogo/2x/googlelogo_color_120x44dp.png");
-            bares.add(bar);
+        // Conexion HTTP
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        Bares clase = retrofit.create(Bares.class);
+        Call<ResponseBody> call = clase.bares(lat, lng, radio);
+        try {
+            // Obtener respuesta
+            String response = call.execute().body().string();
+
+            JSONArray array = new JSONArray(response);
+            JSONObject obj;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Nombre", obj.getString("Nombre"));
+                    hmp.put("Lat", obj.getString("Lat"));
+                    hmp.put("Lng", obj.getString("Lng"));
+                    bares.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
         }
-        {
-            HashMap<String, String> bar = new HashMap<String, String>();
-            bar.put("nickbar", "barejemplo");
-            bar.put("nombre", "Un bar de ejemplo");
-            bar.put("descrbar", "El mejor bar de tapas de ejemplo, con la mejor programación de ejemplo.");
-            bar.put("activado", "0");
-            bar.put("lat", "41.65111400");
-            bar.put("lng", "-0.89438000");
-            bar.put("direccion", "Calle Manuel Escoriaza y Fabro, 51 - 50010 Zaragoza");
-            bar.put("urlimagen", "https://media-cdn.tripadvisor.com/media/photo-s/09/1e/e2/45/la-fusteria-bar-de-tapas.jpg");
-            bares.add(bar);
-        }
+
+        // Cerrar conexion
+        call.cancel();
 
         return bares;
     }
 
+    /**
+     * `Peticion HTTP para funcion getFavoritos()
+     */
     private interface Categorias {
         @GET("categorias")
         Call<ResponseBody> categorias();
     }
+
     /**
-     * @return lista de todas las categorías existentes
+     * Obtener lista de diccionarios de todas las categorías existentes
+     * @return lista de diccionarios de todas las categorías existentes
      */
     public List<HashMap<String, String>> getCategorias() {
         List<HashMap<String, String>> categorias = new ArrayList<HashMap<String, String>>();
+
+        // Conexion HTTP
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI)
                 .build();
         Categorias clase = retrofit.create(Categorias.class);
         Call<ResponseBody> call = clase.categorias();
         try {
+            // Obtener respuesta
             String response = call.execute().body().string();
 
             JSONArray array = new JSONArray(response);
-            JSONObject obj = null;
+            JSONObject obj;
 
             for (int i=0; i < array.length(); i++) {
                 try {
                     HashMap<String, String> hmp = new HashMap<String, String>();
                     obj = array.getJSONObject(i);
-                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Categoria", obj.getString("Nombre"));
                     categorias.add(hmp);
 
                 } catch (JSONException e) {
@@ -100,34 +122,41 @@ public class ClienteRest implements Serializable {
             return null;
         }
 
+        // Cerrar conexion
         call.cancel();
 
         return categorias;
     }
 
-
+    /**
+     * `Peticion HTTP para funcion getProgramacionProxima()
+     */
     private interface ProgramacionProxima {
         @GET("programacion")
         Call<ResponseBody> programacionProxima();
     }
 
     /**
+     * Obtener lista de diccionarios de todos los programas presentes o futuros
+     *         y sus detalles ordenados de más próximos a más lejanos en el tiempo
      * @return lista de diccionarios de todos los programas presentes o futuros
      *         y sus detalles ordenados de más próximos a más lejanos en el tiempo
      */
     public List<HashMap<String, String>> getProgramacionProxima() {
         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
 
+        // Conexion HTTP
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI)
                 .build();
         ProgramacionProxima clase = retrofit.create(ProgramacionProxima.class);
         Call<ResponseBody> call = clase.programacionProxima();
         try {
+            // Obtener respuesta
             String response = call.execute().body().string();
 
             JSONArray array = new JSONArray(response);
-            JSONObject obj = null;
+            JSONObject obj;
 
             for (int i=0; i < array.length(); i++) {
                 try {
@@ -148,6 +177,7 @@ public class ClienteRest implements Serializable {
             return null;
         }
 
+        // Cerrar conexion
         call.cancel();
 
         return programas;
@@ -229,28 +259,37 @@ public class ClienteRest implements Serializable {
         return programas;
     }
 
-
+    /**
+     * `Peticion HTTP para funcion getProgramacionDestacado()
+     */
     private interface ProgramacionDestacado {
         @GET("destacados")
         Call<ResponseBody> programacionDestacado();
     }
 
     /**
+     * Obtener lista de diccionarios de todos los programas presentes o futuros
+     *         marcados como destacados y sus detalles ordenados de más
+     *         próximos a más lejanos en el tiempo
      * @return lista de diccionarios de todos los programas presentes o futuros
      *         marcados como destacados y sus detalles ordenados de más
      *         próximos a más lejanos en el tiempo
      */
     public List<HashMap<String, String>> getProgramacionDestacada() {
         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+
+        // Conexion HTTP
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(URI)
                 .build();
         ProgramacionDestacado clase = retrofit.create(ProgramacionDestacado.class);
         Call<ResponseBody> call = clase.programacionDestacado();
         try {
+
+            // Obtener respuesta
             String response = call.execute().body().string();
             JSONArray array = new JSONArray(response);
-            JSONObject obj = null;
+            JSONObject obj;
 
             for (int i=0; i < array.length(); i++) {
                 try {
@@ -271,46 +310,116 @@ public class ClienteRest implements Serializable {
             return null;
         }
 
+        // Cerrar conexion
         call.cancel();
 
         return programas;
     }
 
+    /**
+     * `Peticion HTTP para funcion buscar()
+     */
+    private interface Buscar {
+        @GET("busqueda")
+        Call<ResponseBody> buscar(@Query("find") String find, @Query("cat") String cat,
+                                  @Query("day") int day, @Query("month") int month,
+                                    @Query("year") int year);
+    }
 
+    /**
+     * Obtener lista de diccionarios de todos los programas filtrados o no por los datos proporcionados
+     * @param buscado bar o programa a buscar
+     * @param cat categoria
+     * @param dia diag
+     * @param mes mes
+     * @param anyo año
+     * @return lista de diccionarios de todos los programas filtrados o no por los datos proporcionados
+     */
+    public List<HashMap<String, String>> buscar(String buscado, String cat, int dia, int mes, int anyo) {
+        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+
+        // Conexion HTTP
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        Buscar clase = retrofit.create(Buscar.class);
+
+        // Tratamiento de parametros a pasar
+        if (cat == null) cat = "";
+        if (buscado == null) buscado = "";
+        Call<ResponseBody> call = clase.buscar(buscado, cat, dia, mes, anyo);
+        try {
+
+            // Obtener respuesta
+            String response = call.execute().body().string();
+            JSONArray array = new JSONArray(response);
+            JSONObject obj;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
+        }
+
+        // Cerrar conexion
+        call.cancel();
+
+        return programas;
+    }
+
+    /**
+     * `Peticion HTTP para funcion getFavoritos()
+     */
     private interface Favoritos {
         @GET("actualizar")
         Call<ResponseBody> favoritos(@Query("lista") String lista);
     }
 
     /**
+     * Obtener lista de diccionarios de todos los favoritos del usuario
+     * @param mDb BBDD local de favoritos
      * @return lista de diccionarios de todos los favoritos del usuario
      */
      public List<HashMap<String, String>> getFavoritos(FavoritosDbAdapter mDb) {
-         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
+         List<HashMap<String, String>> favoritos = new ArrayList<HashMap<String, String>>();
+
+         // Conexion HTTP
          Retrofit retrofit = new Retrofit.Builder()
                   .baseUrl(URI)
                   .build();
-         Favoritos f = retrofit.create(Favoritos.class);
+         Favoritos clase = retrofit.create(Favoritos.class);
 
+         // Preparar parametros a pasar
          JSONArray arrayIni = new JSONArray();
 
          // Extrar favoritos del BBDD local
-         Cursor cursor = mDb.ExtraerFavoritosAPI();
-         try {
+         try (Cursor cursor = mDb.ExtraerFavoritosAPI()) {
              while (cursor.moveToNext()) {
                  try {
                      JSONObject obj = new JSONObject();
-                     obj.put("Titulo",cursor.getString(cursor.getColumnIndex(KEY_TITULO)));
+                     obj.put("Titulo", cursor.getString(cursor.getColumnIndex(KEY_TITULO)));
                      obj.put("Bar", cursor.getString(cursor.getColumnIndex(KEY_BAR)));
                      arrayIni.put(obj);
                  } catch (JSONException e) {
                      e.printStackTrace();
                  }
-              }
-         } finally {
-              cursor.close();
+             }
          }
 
+         // Codificar la peticion para eliminar errores con ":" y "&"
          String encoded = null;
          try {
              encoded = URLEncoder.encode(arrayIni.toString(), "UTF-8");
@@ -318,16 +427,17 @@ public class ClienteRest implements Serializable {
              e.printStackTrace();
          }
 
-         Call<ResponseBody> fs = f.favoritos(encoded);
+         Call<ResponseBody> call = clase.favoritos(encoded);
          try {
-             String response = fs.execute().body().string();
+             // Obtener respuesta
+             String response = call.execute().body().string();
 
              // Actualizar BBDD local;
              mDb.EliminarTodosFavoritos();
 
 
              JSONArray array = new JSONArray(response);
-             JSONObject obj = null;
+             JSONObject obj;
 
              for (int i=0; i < array.length(); i++) {
 
@@ -345,7 +455,7 @@ public class ClienteRest implements Serializable {
                      hmp.put("Descr", obj.getString("Descr"));
                      hmp.put("Inicio", obj.getString("Inicio"));
                      hmp.put("Fin", obj.getString("Fin"));
-                     programas.add(hmp);
+                     favoritos.add(hmp);
 
                  } catch (JSONException e) {
                      e.printStackTrace();
@@ -355,9 +465,10 @@ public class ClienteRest implements Serializable {
               return null;
          }
 
-         fs.cancel();
+         // Cerrar conexion
+         call.cancel();
 
-         return programas;
+         return favoritos;
      }
 
 }
