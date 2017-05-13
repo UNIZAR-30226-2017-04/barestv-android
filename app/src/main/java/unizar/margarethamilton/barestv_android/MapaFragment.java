@@ -52,8 +52,7 @@ public class MapaFragment extends Fragment implements
      * returned in Activity.onActivityResult
      */
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-    private LinearLayout ll;
-    private FragmentActivity fa;
+    View view;
 
 
     public static MapaFragment newInstance() {
@@ -67,7 +66,9 @@ public class MapaFragment extends Fragment implements
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view =  inflater.inflate(R.layout.activity_maps, container, false);
+        if (view==null) {
+            view = inflater.inflate(R.layout.activity_maps, container, false);
+        }
 
         if (TextUtils.isEmpty(getResources().getString(R.string.google_maps_api_key))) {
             throw new IllegalStateException("You forgot to supply a Google Maps API key");
@@ -78,10 +79,14 @@ public class MapaFragment extends Fragment implements
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
-                public void onMapReady(GoogleMap map) {
-                    loadMap(map);
+                public void onMapReady(GoogleMap map) {loadMap(map);
                 }
+
             });
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this).build();
         } else {
             Toast.makeText(getActivity(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -113,10 +118,6 @@ public class MapaFragment extends Fragment implements
         if (map != null) {
             // Now that map has loaded, let's get our location!
             map.setMyLocationEnabled(true);
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
             connectClient();
         }
     }
