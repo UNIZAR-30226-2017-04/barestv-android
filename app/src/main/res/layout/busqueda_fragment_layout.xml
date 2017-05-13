@@ -68,6 +68,15 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/empty_list_item"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="@dimen/appbar_padding_top"
+            android:text="@string/emptyList"
+            android:textAlignment="center"
+            android:textSize="18sp"
+            android:visibility="gone"></TextView>
         <android.support.v4.widget.SwipeRefreshLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/swiperefreshProx"
@@ -79,7 +88,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         </android.support.v4.widget.SwipeRefreshLayout>
-
 
 
     </LinearLayout>

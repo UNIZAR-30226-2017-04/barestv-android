@@ -84,6 +84,7 @@ public class activity_tabs extends AppCompatActivity {
 
     public void destacadosClick (View v) {
         destacadoFragment.destacadosClick(v);
+        busquedaFragment.destacadosClick(v);
     }
 
     public void favoritosClick (View v) {
@@ -111,8 +112,8 @@ public class activity_tabs extends AppCompatActivity {
                     return  busquedaFragment;
                 case 2:
                     return favoritosFragment;
-                case 3: // Solo utilizar cuando los mapas estén implementados
-                    return mapaFragment; // Solo utilizar cuando los mapas estén implementados
+                //case 3: // Solo utilizar cuando los mapas estén implementados
+                   // return mapaFragment; // Solo utilizar cuando los mapas estén implementados
             }
             return null;
             //return PlaceholderFragment.newInstance(position + 1);
@@ -122,7 +123,7 @@ public class activity_tabs extends AppCompatActivity {
         public int getCount() {
             // Show 3 total pages.
             //return 4; -- Solo utilizar cuando los mapas estén implementados
-            return 4;
+            return 3;
         }
 
         @Override
