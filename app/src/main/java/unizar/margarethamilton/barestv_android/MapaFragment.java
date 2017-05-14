@@ -83,10 +83,7 @@ public class MapaFragment extends Fragment implements
                 }
 
             });
-            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
-                    .addApi(LocationServices.API)
-                    .addConnectionCallbacks(this)
-                    .addOnConnectionFailedListener(this).build();
+
         } else {
             Toast.makeText(getActivity(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -117,6 +114,12 @@ public class MapaFragment extends Fragment implements
     void getMyLocation() {
         if (map != null) {
             // Now that map has loaded, let's get our location!
+            if (mGoogleApiClient==null){
+                mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                        .addApi(LocationServices.API)
+                        .addConnectionCallbacks(this)
+                        .addOnConnectionFailedListener(this).build();
+            }
             map.setMyLocationEnabled(true);
             connectClient();
         }
@@ -203,6 +206,14 @@ public class MapaFragment extends Fragment implements
      */
     @Override
     public void onConnected(Bundle dataBundle) {
+        if (mGoogleApiClient==null){
+            mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this).build();
+        }
+        mGoogleApiClient.connect();
+        startLocationUpdates();
         // Display the connection status
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location != null) {
@@ -213,7 +224,6 @@ public class MapaFragment extends Fragment implements
         } else {
             Toast.makeText(getActivity(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
         }
-        startLocationUpdates();
     }
 
     protected void startLocationUpdates() {
