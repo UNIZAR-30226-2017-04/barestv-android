@@ -12,12 +12,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
@@ -54,6 +57,8 @@ public class MapaFragment extends Fragment implements
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     View view;
 
+    OnFragmentInteractionListener mListener;
+
 
     public static MapaFragment newInstance() {
         MapaFragment fragment = new MapaFragment();
@@ -87,7 +92,6 @@ public class MapaFragment extends Fragment implements
         } else {
             Toast.makeText(getActivity(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
-
         return view;
     }
 
@@ -97,6 +101,13 @@ public class MapaFragment extends Fragment implements
             // Map is ready
             Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapaFragmentPermissionsDispatcher.getMyLocationWithCheck(this);
+            map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+                @Override
+                public boolean onMarkerClick(Marker marker) {
+                    mListener.barPulsado(marker.getTitle());
+                    return false;
+                }
+            });
         } else {
             Toast.makeText(getActivity(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -153,6 +164,27 @@ public class MapaFragment extends Fragment implements
         super.onStop();
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnFragmentInteractionListener) {
+            mListener = (OnFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener=null;
+    }
+
+    /*Interfaz para comunicar a la busqueda el bar pulsado*/
+    public interface OnFragmentInteractionListener {
+        void barPulsado(String bar);
+    }
     /*
      * Handle results returned to the FragmentActivity by Google Play services
      */

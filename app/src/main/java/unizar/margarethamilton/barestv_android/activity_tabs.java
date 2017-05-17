@@ -29,7 +29,7 @@ import android.widget.Toast;
 
 import unizar.margarethamilton.connection.ClienteRest;
 
-public class activity_tabs extends AppCompatActivity {
+public class activity_tabs extends AppCompatActivity implements MapaFragment.OnFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -55,8 +55,6 @@ public class activity_tabs extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tabs);
-        Intent in = getIntent();
-        int currentTab = in.getIntExtra("Tab",0);
 
         // Create the adapter that will return a fragment for each of the four
         // primary sections of the activity.
@@ -72,7 +70,6 @@ public class activity_tabs extends AppCompatActivity {
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
         }
-        mViewPager.setCurrentItem(currentTab);
         clienteRest = new ClienteRest();
 
         destacadoFragment = DestacadoFragment.newInstance(clienteRest);
@@ -91,6 +88,11 @@ public class activity_tabs extends AppCompatActivity {
         favoritosFragment.favoritosClick(v);
     }
 
+    public void barPulsado(String bar){
+        mViewPager.setCurrentItem(1);
+        busquedaFragment.programacionBar(bar);
+
+    }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to
      * one of the sections/tabs/pages.
