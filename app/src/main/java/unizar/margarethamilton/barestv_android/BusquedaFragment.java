@@ -216,6 +216,7 @@ public class BusquedaFragment extends Fragment {
 
     public void programacionBar(String bar){
     //TODO: por implementar
+        new SetBusquedaTask("Bar:"+bar).execute();
     }
 
     public void quitarFiltros(){
@@ -400,7 +401,7 @@ public class BusquedaFragment extends Fragment {
             if (snackbar != null) snackbar.dismiss();
 
             // Obtiene del BBDD remoto las programaciones destacadas
-            List<HashMap<String, String>> programacion = clienteRest.buscar(query,"",0,0,0);
+            List<HashMap<String, String>> programacion = clienteRest.buscar(query,"",1,1,1);
 
             // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
@@ -421,6 +422,10 @@ public class BusquedaFragment extends Fragment {
                     R.id.inicio, R.id.fin};
             hayBusqueda=true;
             ultimaBusqueda=query;
+            if(query.contains("Bar:")){
+                String realQuery = query.split("Bar:")[1];
+                programacion=clienteRest.getProgramacionDadoBar(realQuery);
+            }
             ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
                     programacion, from, to);
             if(hayFiltro){
@@ -431,7 +436,7 @@ public class BusquedaFragment extends Fragment {
                         programacionFiltrada = clienteRest.buscar(query, filtroCategoria, filtroFechaDia,
                                 filtroFechaMes, filtroFechaAño);
                     }else {
-                        programacionFiltrada = clienteRest.buscar(query,filtroCategoria,0,0,0);
+                        programacionFiltrada = clienteRest.buscar(query,filtroCategoria,1,1,1);
                     }
                     // Configurar el adapter
                     res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
@@ -463,6 +468,7 @@ public class BusquedaFragment extends Fragment {
                 if(adapter.isEmpty()){
                     noResText.setVisibility(View.VISIBLE);
                 }
+                searchView.setQuery(query,false);
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
             }

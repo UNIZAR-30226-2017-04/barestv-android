@@ -13,6 +13,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -41,7 +42,7 @@ import permissions.dispatcher.RuntimePermissions;
 public class MapaFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener{
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
@@ -101,6 +102,9 @@ public class MapaFragment extends Fragment implements
             // Map is ready
             Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapaFragmentPermissionsDispatcher.getMyLocationWithCheck(this);
+            LatLng barejemplo = new LatLng(46, 0);
+            googleMap.addMarker(new MarkerOptions().position(barejemplo)
+                    .title("barejemplo"));
             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -108,6 +112,7 @@ public class MapaFragment extends Fragment implements
                     return false;
                 }
             });
+
         } else {
             Toast.makeText(getActivity(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
@@ -142,6 +147,7 @@ public class MapaFragment extends Fragment implements
             mGoogleApiClient.connect();
         }
     }
+
 
     /*
      * Called when the Activity becomes visible.

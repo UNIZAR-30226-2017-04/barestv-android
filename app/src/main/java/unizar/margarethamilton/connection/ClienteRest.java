@@ -24,7 +24,8 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
 public class ClienteRest implements Serializable {
     // dirección por defecto de la api
-    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
+//    private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
+    private static final String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
 
     /**
      * `Peticion HTTP para funcion getBares()
@@ -379,6 +380,7 @@ public class ClienteRest implements Serializable {
 
         return programas;
     }
+
 
     /**
      * `Peticion HTTP para funcion getFavoritos()
