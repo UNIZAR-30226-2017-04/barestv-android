@@ -75,7 +75,7 @@ public class activity_tabs extends AppCompatActivity implements MapaFragment.OnF
         destacadoFragment = DestacadoFragment.newInstance(clienteRest);
         busquedaFragment = BusquedaFragment.newInstance(clienteRest);
         favoritosFragment = FavoritosFragment.newInstance(clienteRest);
-        mapaFragment = MapaFragment.newInstance();
+        mapaFragment = MapaFragment.newInstance(clienteRest);
     }
 
 

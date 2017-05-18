@@ -32,7 +32,7 @@ public class ClienteRest implements Serializable {
      */
     private interface Bares {
         @GET("bar")
-        Call<ResponseBody> bares(@Query("lat") int lat, @Query("lng") int lng,
+        Call<ResponseBody> bares(@Query("lat") double lat, @Query("lng") double lng,
                                  @Query("radio") int radio);
     }
 
@@ -43,7 +43,7 @@ public class ClienteRest implements Serializable {
      * @param radio radio de cercania
      * @return lista de diccionarios de todos los bares cercanos
      */
-    public List<HashMap<String, String>> getBares(int lat, int lng, int radio) {
+    public List<HashMap<String, String>> getBares(double lat, double lng, int radio) {
         List<HashMap<String, String>> bares = new ArrayList<HashMap<String, String>>();
 
         // Conexion HTTP
