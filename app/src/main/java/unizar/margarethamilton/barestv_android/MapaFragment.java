@@ -1,5 +1,22 @@
 package unizar.margarethamilton.barestv_android;
 
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentSender;
+import android.location.Location;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -15,27 +32,6 @@ import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-
-import android.app.Activity;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentSender;
-import android.location.Location;
-import android.net.Uri;
-import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
-import android.support.v4.app.FragmentTransaction;
-import android.text.TextUtils;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.List;
@@ -128,6 +124,7 @@ public class MapaFragment extends Fragment implements
             LatLng barejemplo = new LatLng(46, 0);
             googleMap.addMarker(new MarkerOptions().position(barejemplo)
                     .title("barejemplo"));
+
             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -282,9 +279,9 @@ public class MapaFragment extends Fragment implements
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
             map.animateCamera(cameraUpdate);
+            new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
 
-
-            añadirMarcadores(location.getLatitude(),location.getLongitude());
+            //añadirMarcadores(location.getLatitude(),location.getLongitude());
             LatLng barejemplo = new LatLng(46, 0);
             map.addMarker(new MarkerOptions().position(barejemplo)
                     .title("barejemplo"));
@@ -312,6 +309,7 @@ public class MapaFragment extends Fragment implements
 //                Double.toString(location.getLatitude()) + "," +
 //                Double.toString(location.getLongitude());
 //        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+        new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
 
     }
 
@@ -403,7 +401,7 @@ public class MapaFragment extends Fragment implements
         map.clear();
 
         // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,100);
+        List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,500);
 
         // Si no se ha podido establecer la conexion
         if (bares == null) {
@@ -426,6 +424,69 @@ public class MapaFragment extends Fragment implements
                 map.addMarker(new MarkerOptions()
                         .position(new LatLng(lat, lng))
                         .title(nombre));
+            }
+        }
+    }
+
+    /**
+     * Rellena el listview con datods dados por el API de forma asincrona para el caso de programacion proxima
+     */
+    private class SetAñadirMarcadoresTask extends AsyncTask<Void, Void, List<HashMap<String,String>>> {
+
+        public double latitud;
+        public double longitud;
+
+        public SetAñadirMarcadoresTask(double lat, double lon){
+            this.latitud=lat;
+            this.longitud=lon;
+        }
+        /**
+         * Comunicacion asincrona
+         * @param e void
+         * @return ArrayAdapter
+         */
+        protected List<HashMap<String,String>> doInBackground(Void... e) {
+
+            // Eliminamos el snackbar anterior si no esta elinimado
+            if (snackbar != null) snackbar.dismiss();
+
+
+
+            // Obtiene del BBDD remoto las programaciones destacadas
+            List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,100);
+
+            return bares;
+
+
+        }
+
+        /**
+         * Una vez obtenido los datos, se rellena el listview
+         * @param bares
+         */
+        protected void onPostExecute(List<HashMap<String,String>> bares) {
+            if (bares == null) {
+                try {
+                    // Mensaje error en caso de no poder conectar con la BBDD
+                    snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
+                            .setAction("Action", null);
+                    snackbar.show();
+                } catch (Exception x) {
+                    x.printStackTrace();
+                }
+            } else {
+                map.clear();
+                String nombre;
+                Double lat;
+                Double lng;
+                for (int i = 0; i < bares.size(); i++) {
+                    nombre = bares.get(i).get("Nombre");
+                    lat = Double.parseDouble(bares.get(i).get("Lat"));
+                    lng = Double.parseDouble(bares.get(i).get("Lng"));
+                    map.addMarker(new MarkerOptions()
+                            .position(new LatLng(lat, lng))
+                            .title(nombre));
+                }
             }
         }
     }
