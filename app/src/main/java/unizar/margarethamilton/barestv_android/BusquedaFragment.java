@@ -2,10 +2,8 @@ package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -18,7 +16,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -31,8 +28,6 @@ import java.util.List;
 import unizar.margarethamilton.connection.ClienteRest;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 import unizar.margarethamilton.listViewConfig.ListHashAdapter;
-
-import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by ivo on 21/03/17.
@@ -93,6 +88,7 @@ public class BusquedaFragment extends Fragment {
         setRetainInstance(true);
         mDbHelper = new FavoritosDbAdapter(this.getActivity());
         mDbHelper.open();
+        setUserVisibleHint(false);
     }
 
 
@@ -208,6 +204,23 @@ public class BusquedaFragment extends Fragment {
         }
     }
 
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            if(hayFiltro){
+                snackbarFlitro.show();
+            }if(hayBusqueda){
+                new SetBusquedaTask(ultimaBusqueda).execute();
+            }
+        }
+        else {
+            if(hayFiltro){
+                snackbarFlitro.dismiss();
+            }
+        }
+    }
+
     private void abrirFiltro() {
         Intent i = new Intent(getActivity(), FiltrosActivity.class);
         i.putExtra("ClitenteRest",clienteRest);
@@ -277,6 +290,10 @@ public class BusquedaFragment extends Fragment {
     }
 
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
 
     @Override
     public void onResume() {
@@ -335,11 +352,11 @@ public class BusquedaFragment extends Fragment {
             }
             hayBusqueda=false;
             // Crear un array donde se especifica los datos que se quiere mostrar
-            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin","CheckBox"};
 
             // Crear un array done sse especifica los campos de ListView que se quiere rellenar
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
-                    R.id.inicio, R.id.fin};
+                    R.id.inicio, R.id.fin,R.id.favCheck};
             ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
                     programacion, from, to);
             if(hayFiltro){
@@ -416,10 +433,10 @@ public class BusquedaFragment extends Fragment {
                     programacion.get(i).put("CheckBox", "0");
                 }
             }
-            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin"};
+            String[] from = new String[] { "Titulo", "Categoria", "Bar", "Descr", "Inicio", "Fin","CheckBox"};
 
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
-                    R.id.inicio, R.id.fin};
+                    R.id.inicio, R.id.fin,R.id.favCheck};
             hayBusqueda=true;
             ultimaBusqueda=query;
             if(query.contains("Bar:")){

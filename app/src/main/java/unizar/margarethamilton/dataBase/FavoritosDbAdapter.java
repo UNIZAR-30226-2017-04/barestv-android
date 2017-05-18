@@ -7,7 +7,6 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.database.DatabaseUtils;
 
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
@@ -218,8 +217,11 @@ public class FavoritosDbAdapter {
      */
     public Boolean comprobarFavorito(String titulo, String bar) {
         String[] args = {titulo, bar};
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO}, KEY_TITULO + "=?" +
-                     " AND " + KEY_BAR + "=?", args, null, null, null, null).getCount()>0;
+        Cursor query = mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO}, KEY_TITULO + "=?" +
+                " AND " + KEY_BAR + "=?", args, null, null, null, null);
+        boolean esFav = query.getCount()>0;
+        query.close();
+        return esFav;
     }
 }
 

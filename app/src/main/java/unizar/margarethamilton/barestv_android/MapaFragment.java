@@ -394,39 +394,6 @@ public class MapaFragment extends Fragment implements
         ft.commit();
     }
 
-    protected void añadirMarcadores(double latitud, double longitud) {
-// Eliminamos el snackbar anterior si no esta elinimado
-        if (snackbar != null) snackbar.dismiss();
-
-        map.clear();
-
-        // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,500);
-
-        // Si no se ha podido establecer la conexion
-        if (bares == null) {
-            try {
-                // Mensaje error en caso de no poder conectar con la BBDD
-                snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Action", null);
-                snackbar.show();
-            } catch (Exception x) {
-                x.printStackTrace();
-            }
-        } else {
-            String nombre;
-            Double lat;
-            Double lng;
-            for (int i = 0; i < bares.size(); i++) {
-                nombre = bares.get(i).get("Nombre");
-                lat = Double.parseDouble(bares.get(i).get("Lat"));
-                lng = Double.parseDouble(bares.get(i).get("Lng"));
-                map.addMarker(new MarkerOptions()
-                        .position(new LatLng(lat, lng))
-                        .title(nombre));
-            }
-        }
-    }
 
     /**
      * Rellena el listview con datods dados por el API de forma asincrona para el caso de programacion proxima
