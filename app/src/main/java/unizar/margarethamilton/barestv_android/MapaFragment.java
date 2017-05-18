@@ -11,6 +11,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -55,10 +56,13 @@ public class MapaFragment extends Fragment implements
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
+    private UiSettings mUiSettings;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
+
+    private int prueba = 0;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -107,7 +111,7 @@ public class MapaFragment extends Fragment implements
             });
 
         } else {
-            Toast.makeText(getActivity(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Error - Map Fragment was null!!", Toast.LENGTH_SHORT).show();
         }
         return view;
     }
@@ -115,8 +119,11 @@ public class MapaFragment extends Fragment implements
     protected void loadMap(GoogleMap googleMap) {
         map = googleMap;
         if (map != null) {
+            mUiSettings = map.getUiSettings();
+            mUiSettings.setZoomControlsEnabled(true);
+
             // Map is ready
-            Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapaFragmentPermissionsDispatcher.getMyLocationWithCheck(this);
             LatLng barejemplo = new LatLng(46, 0);
             googleMap.addMarker(new MarkerOptions().position(barejemplo)
@@ -130,7 +137,7 @@ public class MapaFragment extends Fragment implements
             });
 
         } else {
-            Toast.makeText(getActivity(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Error - Map was null!!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -234,7 +241,7 @@ public class MapaFragment extends Fragment implements
         // If Google Play services is available
         if (ConnectionResult.SUCCESS == resultCode) {
             // In debug mode, log the status
-            Log.d("Location Updates", "Google Play services is available.");
+            //Log.d("Location Updates", "Google Play services is available.");
             return true;
         } else {
             // Get the error dialog from Google Play services
@@ -271,14 +278,21 @@ public class MapaFragment extends Fragment implements
         // Display the connection status
         Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location != null) {
-            map.clear();
-            Toast.makeText(getActivity(), "GPS location was found!", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
             CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
             map.animateCamera(cameraUpdate);
+
+
             añadirMarcadores(location.getLatitude(),location.getLongitude());
+            LatLng barejemplo = new LatLng(46, 0);
+            map.addMarker(new MarkerOptions().position(barejemplo)
+                    .title("barejemplo"));
         } else {
-            Toast.makeText(getActivity(), "Current location was null, enable GPS on emulator!", Toast.LENGTH_SHORT).show();
+            if (snackbar != null) snackbar.dismiss();
+            snackbar = Snackbar.make(view, R.string.error_conexion_gps, Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Action", null);
+            snackbar.show();
         }
     }
 
@@ -292,11 +306,12 @@ public class MapaFragment extends Fragment implements
     }
 
     public void onLocationChanged(Location location) {
+        if (snackbar != null) snackbar.dismiss();
         // Report to the UI that the location was updated
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
+//        String msg = "Updated Location: " +
+//                Double.toString(location.getLatitude()) + "," +
+//                Double.toString(location.getLongitude());
+//        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
 
     }
 
@@ -307,9 +322,9 @@ public class MapaFragment extends Fragment implements
     @Override
     public void onConnectionSuspended(int i) {
         if (i == CAUSE_SERVICE_DISCONNECTED) {
-            Toast.makeText(getActivity(), "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Disconnected. Please re-connect.", Toast.LENGTH_SHORT).show();
         } else if (i == CAUSE_NETWORK_LOST) {
-            Toast.makeText(getActivity(), "Network lost. Please re-connect.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getActivity(), "Network lost. Please re-connect.", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -337,8 +352,10 @@ public class MapaFragment extends Fragment implements
                 e.printStackTrace();
             }
         } else {
-            Toast.makeText(getActivity(),
-                    "Sorry. Location services not available to you", Toast.LENGTH_LONG).show();
+            if (snackbar != null) snackbar.dismiss();
+            snackbar = Snackbar.make(view, R.string.error_conexion_gps, Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Action", null);
+            snackbar.show();
         }
     }
 
@@ -382,6 +399,8 @@ public class MapaFragment extends Fragment implements
     protected void añadirMarcadores(double latitud, double longitud) {
 // Eliminamos el snackbar anterior si no esta elinimado
         if (snackbar != null) snackbar.dismiss();
+
+        map.clear();
 
         // Obtiene del BBDD remoto las programaciones destacadas
         List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,100);
