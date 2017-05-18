@@ -184,58 +184,13 @@ public class ClienteRest implements Serializable {
         return programas;
     }
 
+
     /**
-     * @return lista de diccionarios de todos los programas presentes o futuros
-     *         y sus detalles ordenados de más próximos a más lejanos en el tiempo
+     * `Peticion HTTP para funcion getProgramacionDadoBar()
      */
-    public List<HashMap<String, String>> getProgramacion() {
-        List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
-
-        {
-            HashMap<String, String> programa = new HashMap<String, String>();
-            programa.put("Titulo", "El Hormiguero");
-            programa.put("Categoria", "Entretenimiento");
-            programa.put("Bar", "Taberna Kalandria");
-            programa.put("Descr", "Programa el Hormiguero, presentado por Pablo Motos");
-            programa.put("Inicio", "04/03/2017 21:00");
-            programa.put("Fin", "04/03/2017 23:00");
-            programas.add(programa);
-        }
-
-        {
-            HashMap<String, String> programa = new HashMap<String, String>();
-            programa.put("Titulo", "La hora de Jose Mota");
-            programa.put("Categoria", "Comedia");
-            programa.put("Bar", "Dantis");
-            programa.put("Descr", "Programa de humor presentado por Jose Mota");
-            programa.put("Inicio", "04/03/2017 21:00");
-            programa.put("Fin", "04/03/2017 24:00");
-            programas.add(programa);
-        }
-
-        {
-            HashMap<String, String> programa = new HashMap<String, String>();
-            programa.put("Titulo", "Real Madrid-A.T.Madrid");
-            programa.put("Categoria", "Deporte");
-            programa.put("Bar", "Almendros");
-            programa.put("Descr", "Jornada 12,Liga BBVA");
-            programa.put("Inicio", "05/03/2017 20:00");
-            programa.put("Fin", "05/03/2017 22:30");
-            programas.add(programa);
-        }
-
-        {
-            HashMap<String, String> programa = new HashMap<String, String>();
-            programa.put("Titulo", "Barcelona-Sevilla");
-            programa.put("Categoria", "Deporte");
-            programa.put("Bar", "Bar Buenavista");
-            programa.put("Descr", "Jornada 12,Liga BBVA");
-            programa.put("Inicio", "06/03/2017 17:00");
-            programa.put("Fin", "06/03/2017 19:30");
-            programas.add(programa);
-        }
-
-        return programas;
+    private interface ProgramacionDadoBar {
+        @GET("programasBar")
+        Call<ResponseBody> programacionDadoBar(@Query("bar") String bar);
     }
 
     /**
@@ -246,16 +201,43 @@ public class ClienteRest implements Serializable {
     public List<HashMap<String, String>> getProgramacionDadoBar(String nickbar) {
         List<HashMap<String, String>> programas = new ArrayList<HashMap<String, String>>();
 
-        {
-            HashMap<String, String> programa = new HashMap<String, String>();
-            programa.put("Titulo", "La hora de Jose Mota");
-            programa.put("Categoria", "Comedia");
-            programa.put("Bar", "Dantis");
-            programa.put("Descr", "Programa de humor presentado por Jose Mota");
-            programa.put("Inicio", "04/03/2017 21:00");
-            programa.put("Fin", "04/03/2017 24:00");
-            programas.add(programa);
+        // Conexion HTTP
+        Retrofit retrofit = new Retrofit.Builder()
+                .baseUrl(URI)
+                .build();
+        ProgramacionDadoBar clase = retrofit.create(ProgramacionDadoBar.class);
+
+        // Tratamiento de parametros a pasar
+        if (nickbar == null) nickbar = "";
+        Call<ResponseBody> call = clase.programacionDadoBar(nickbar);
+        try {
+
+            // Obtener respuesta
+            String response = call.execute().body().string();
+            JSONArray array = new JSONArray(response);
+            JSONObject obj;
+
+            for (int i=0; i < array.length(); i++) {
+                try {
+                    HashMap<String, String> hmp = new HashMap<String, String>();
+                    obj = array.getJSONObject(i);
+                    hmp.put("Titulo", obj.getString("Titulo"));
+                    hmp.put("Categoria", obj.getString("Cat"));
+                    hmp.put("Bar", obj.getString("Bar"));
+                    hmp.put("Descr", obj.getString("Descr"));
+                    hmp.put("Inicio", obj.getString("Inicio"));
+                    hmp.put("Fin", obj.getString("Fin"));
+                    programas.add(hmp);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }}
+        } catch (Exception e) {
+            return null;
         }
+
+        // Cerrar conexion
+        call.cancel();
 
         return programas;
     }
@@ -408,7 +390,8 @@ public class ClienteRest implements Serializable {
          JSONArray arrayIni = new JSONArray();
 
          // Extrar favoritos del BBDD local
-         try (Cursor cursor = mDb.ExtraerFavoritosAPI()) {
+         Cursor cursor = mDb.ExtraerFavoritosAPI();
+         try {
              while (cursor.moveToNext()) {
                  try {
                      JSONObject obj = new JSONObject();
@@ -419,6 +402,8 @@ public class ClienteRest implements Serializable {
                      e.printStackTrace();
                  }
              }
+         } finally {
+             cursor.close();
          }
 
          Favoritos clase = retrofit.create(Favoritos.class);
