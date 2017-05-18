@@ -23,6 +23,7 @@ import android.content.Intent;
 import android.content.IntentSender;
 import android.location.Location;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
@@ -34,6 +35,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
@@ -43,12 +45,13 @@ import java.util.List;
 import permissions.dispatcher.NeedsPermission;
 import permissions.dispatcher.RuntimePermissions;
 import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 
 @RuntimePermissions
 public class MapaFragment extends Fragment implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
-        LocationListener{
+        LocationListener {
 
     private static final String ARG_PARAM1 = "clientRest";
     private ClienteRest clienteRest;
@@ -61,8 +64,7 @@ public class MapaFragment extends Fragment implements
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
-
-    private int prueba = 0;
+    Location location;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -84,11 +86,9 @@ public class MapaFragment extends Fragment implements
     }
 
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (view==null) {
+        if (view == null) {
             view = inflater.inflate(R.layout.activity_maps, container, false);
         }
 
@@ -105,7 +105,8 @@ public class MapaFragment extends Fragment implements
         if (mapFragment != null) {
             mapFragment.getMapAsync(new OnMapReadyCallback() {
                 @Override
-                public void onMapReady(GoogleMap map) {loadMap(map);
+                public void onMapReady(GoogleMap map) {
+                    loadMap(map);
                 }
 
             });
@@ -153,7 +154,7 @@ public class MapaFragment extends Fragment implements
     void getMyLocation() {
         if (map != null) {
             // Now that map has loaded, let's get our location!
-            if (mGoogleApiClient==null){
+            if (mGoogleApiClient == null) {
                 mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                         .addApi(LocationServices.API)
                         .addConnectionCallbacks(this)
@@ -207,13 +208,14 @@ public class MapaFragment extends Fragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener=null;
+        mListener = null;
     }
 
     /*Interfaz para comunicar a la busqueda el bar pulsado*/
     public interface OnFragmentInteractionListener {
         void barPulsado(String bar);
     }
+
     /*
      * Handle results returned to the FragmentActivity by Google Play services
      */
@@ -267,7 +269,7 @@ public class MapaFragment extends Fragment implements
      */
     @Override
     public void onConnected(Bundle dataBundle) {
-        if (mGoogleApiClient==null){
+        if (mGoogleApiClient == null) {
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addApi(LocationServices.API)
                     .addConnectionCallbacks(this)
@@ -276,7 +278,7 @@ public class MapaFragment extends Fragment implements
         mGoogleApiClient.connect();
         startLocationUpdates();
         // Display the connection status
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location != null) {
             //Toast.makeText(getActivity(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -284,7 +286,7 @@ public class MapaFragment extends Fragment implements
             map.animateCamera(cameraUpdate);
 
 
-            añadirMarcadores(location.getLatitude(),location.getLongitude());
+            new añadirMarcadores().execute();
             LatLng barejemplo = new LatLng(46, 0);
             map.addMarker(new MarkerOptions().position(barejemplo)
                     .title("barejemplo"));
@@ -383,8 +385,7 @@ public class MapaFragment extends Fragment implements
         }
     }
 
-    public void onDestroy()
-    {
+    public void onDestroy() {
 
         super.onDestroy();
 
@@ -396,38 +397,50 @@ public class MapaFragment extends Fragment implements
         ft.commit();
     }
 
-    protected void añadirMarcadores(double latitud, double longitud) {
-// Eliminamos el snackbar anterior si no esta elinimado
-        if (snackbar != null) snackbar.dismiss();
 
-        map.clear();
+    /**
+     * Rellena el listview con datods dados por el API de forma asincrona
+     */
+    private class añadirMarcadores extends AsyncTask<Void, Void, Void> {
 
-        // Obtiene del BBDD remoto las programaciones destacadas
-        List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,100);
+        /**
+         * Comunicacion asincrona
+         */
+        @Override
+        protected Void doInBackground(Void... voids) {
+            {
+                // Eliminamos el snackbar anterior si no esta elinimado
+                if (snackbar != null) snackbar.dismiss();
 
-        // Si no se ha podido establecer la conexion
-        if (bares == null) {
-            try {
-                // Mensaje error en caso de no poder conectar con la BBDD
-                snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
-                        .setAction("Action", null);
-                snackbar.show();
-            } catch (Exception x) {
-                x.printStackTrace();
+                // Obtiene del BBDD remoto las programaciones destacadas
+                List<HashMap<String, String>> bares = clienteRest.getBares(location.getLatitude(), location.getLongitude(), 100);
+
+                // Si no se ha podido establecer la conexion
+                if (bares == null) {
+                    try {
+                        // Mensaje error en caso de no poder conectar con la BBDD
+                        snackbar = Snackbar.make(view, R.string.error_conexion, Snackbar.LENGTH_INDEFINITE)
+                                .setAction("Action", null);
+                        snackbar.show();
+                    } catch (Exception x) {
+                        x.printStackTrace();
+                    }
+                } else {
+                    map.clear();
+                    String nombre;
+                    Double lat;
+                    Double lng;
+                    for (int i = 0; i < bares.size(); i++) {
+                        nombre = bares.get(i).get("Nombre");
+                        lat = Double.parseDouble(bares.get(i).get("Lat"));
+                        lng = Double.parseDouble(bares.get(i).get("Lng"));
+                        map.addMarker(new MarkerOptions()
+                                .position(new LatLng(lat, lng))
+                                .title(nombre));
+                    }
+                }
             }
-        } else {
-            String nombre;
-            Double lat;
-            Double lng;
-            for (int i = 0; i < bares.size(); i++) {
-                nombre = bares.get(i).get("Nombre");
-                lat = Double.parseDouble(bares.get(i).get("Lat"));
-                lng = Double.parseDouble(bares.get(i).get("Lng"));
-                map.addMarker(new MarkerOptions()
-                        .position(new LatLng(lat, lng))
-                        .title(nombre));
-            }
+            return null;
         }
     }
-
 }
