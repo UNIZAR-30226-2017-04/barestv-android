@@ -224,9 +224,10 @@ public class FavoritosFragment extends Fragment {
                     snackbar = Snackbar.make(view, R.string.error_conexion_favoritos,
                             Snackbar.LENGTH_INDEFINITE).setAction("Action", null);
                     snackbar.show();
-                    swipeRefreshLayout.setRefreshing(false);
+
 
                 } catch (Exception x) { x.printStackTrace();}
+                swipeRefreshLayout.setRefreshing(false);
             } else {
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
