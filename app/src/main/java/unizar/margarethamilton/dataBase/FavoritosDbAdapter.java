@@ -8,6 +8,14 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+
+import static android.content.Context.MODE_PRIVATE;
+
 /**
  * Simple notes database access helper class. Defines the basic CRUD operations
  * for the notepad example, and gives the ability to list all notes as well as
@@ -55,13 +63,28 @@ public class FavoritosDbAdapter {
     private static class DatabaseHelper extends SQLiteOpenHelper {
 
         DatabaseHelper(Context context) {
+
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+            // Al mismo tiempo, creamos fichero para conectar a la BBDD remota
+            try {
+                FileOutputStream os = context.openFileOutput("IP.txt", MODE_PRIVATE);
+                OutputStreamWriter writer = new OutputStreamWriter(os);
+                writer.write("192.168.0.154:8080");
+                writer.close();
+                os.close();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
 
         @Override
         public void onCreate(SQLiteDatabase db) {
             android.util.Log.d("TAG", DATABASE_CREATE);
             db.execSQL(DATABASE_CREATE);
+
         }
 
         @Override

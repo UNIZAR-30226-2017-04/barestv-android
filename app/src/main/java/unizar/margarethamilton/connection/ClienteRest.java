@@ -1,9 +1,15 @@
 package unizar.margarethamilton.connection;
 
+import android.content.Context;
 import android.database.Cursor;
 
 import org.json.*;
 
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -25,8 +31,23 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 public class ClienteRest implements Serializable {
     // dirección por defecto de la api
     //private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
-    private static final String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
+    private static String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
 
+    public ClienteRest(Context ctx) {
+        try {
+            FileInputStream fs = ctx.openFileInput("IP.txt");
+            InputStreamReader reader = new InputStreamReader(fs);
+            BufferedReader bufferedReader = new BufferedReader(reader);
+            URI = "http://"+bufferedReader.readLine()+"/baresTvServicio/rest/server/";
+            bufferedReader.close();
+            reader.close();
+            fs.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * `Peticion HTTP para funcion getBares()
      */

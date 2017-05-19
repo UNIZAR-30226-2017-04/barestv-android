@@ -178,7 +178,7 @@ public class BusquedaFragment extends Fragment {
         return view;
     }
 
-    public void destacadosClick (View v) {
+    public void busquedaClick (View v) {
         RelativeLayout vwParentRow = (RelativeLayout)v.getParent();
         CheckBox favoritoV = (CheckBox) vwParentRow.findViewById(R.id.favCheck);
         if (favoritoV.isChecked()) {
@@ -357,7 +357,7 @@ public class BusquedaFragment extends Fragment {
             // Crear un array done sse especifica los campos de ListView que se quiere rellenar
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                     R.id.inicio, R.id.fin,R.id.favCheck};
-            ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
+            ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                     programacion, from, to);
             if(hayFiltro){
                 quitarFiltros();
@@ -369,7 +369,7 @@ public class BusquedaFragment extends Fragment {
                         }
                     }
                     // Configurar el adapter
-                    res =  new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
+                    res =  new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
                 }
             }
@@ -443,7 +443,7 @@ public class BusquedaFragment extends Fragment {
                 String realQuery = query.split("Bar:")[1];
                 programacion=clienteRest.getProgramacionDadoBar(realQuery);
             }
-            ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
+            ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                     programacion, from, to);
             if(hayFiltro){
                 quitarFiltros();
@@ -456,11 +456,11 @@ public class BusquedaFragment extends Fragment {
                         programacionFiltrada = clienteRest.buscar(query,filtroCategoria,1,1,1);
                     }
                     // Configurar el adapter
-                    res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
+                    res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
                 } else if(hayFiltroFecha){
                     programacionFiltrada=clienteRest.buscar(query,"",filtroFechaDia,filtroFechaMes,filtroFechaAño);
-                    res = new ListHashAdapter(getActivity(), R.layout.destacado_listview_content,
+                    res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
                 }
 

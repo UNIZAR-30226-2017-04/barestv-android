@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import unizar.margarethamilton.connection.ClienteRest;
+import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 
 public class activity_tabs extends AppCompatActivity implements MapaFragment.OnFragmentInteractionListener {
 
@@ -70,7 +71,9 @@ public class activity_tabs extends AppCompatActivity implements MapaFragment.OnF
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
         }
-        clienteRest = new ClienteRest();
+
+        FavoritosDbAdapter mdb = new FavoritosDbAdapter(this);
+        clienteRest = new ClienteRest(this);
 
         destacadoFragment = DestacadoFragment.newInstance(clienteRest);
         busquedaFragment = BusquedaFragment.newInstance(clienteRest);
@@ -81,7 +84,10 @@ public class activity_tabs extends AppCompatActivity implements MapaFragment.OnF
 
     public void destacadosClick (View v) {
         destacadoFragment.destacadosClick(v);
-        busquedaFragment.destacadosClick(v);
+    }
+
+    public void busquedaClick (View v) {
+        busquedaFragment.busquedaClick(v);
     }
 
     public void favoritosClick (View v) {

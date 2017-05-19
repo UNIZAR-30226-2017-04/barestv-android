@@ -155,6 +155,12 @@ public class FavoritosFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onStart() {
+        super.onStart();
+        android.util.Log.d("TAAAAG", "eeeeeeeeee");
+        new FavoritosFragment.SetFavoritosTask().execute();
+    }
 
     /**
      * Rellena el listview con datods dados por el API de forma asincrona

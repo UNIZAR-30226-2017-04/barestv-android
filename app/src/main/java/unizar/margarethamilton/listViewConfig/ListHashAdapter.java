@@ -61,15 +61,17 @@ public class ListHashAdapter extends ArrayAdapter {
 
         HashMap<String, String> entry = (HashMap<String, String>) this.getItem(position);
 
-        // Mapea los datos a los campos del ListView
-        for (int i=0; i < from.length; i++) {
-             if (v[i] instanceof CheckBox) {
-                setCheckBox((CheckBox) v[i], entry.get(from[i]));
-            } else if (v[i] instanceof TextView) {
-                setViewText((TextView) v[i], entry.get(from[i]));
-            }
+        try {
+            // Mapea los datos a los campos del ListView
+            for (int i = 0; i < from.length; i++) {
+                if (v[i] instanceof CheckBox) {
+                    setCheckBox((CheckBox) v[i], entry.get(from[i]));
+                } else if (v[i] instanceof TextView) {
+                    setViewText((TextView) v[i], entry.get(from[i]));
+                }
 
-        }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
 
         return convertView;
     }
