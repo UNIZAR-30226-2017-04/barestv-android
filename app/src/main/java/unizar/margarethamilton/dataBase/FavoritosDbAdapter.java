@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -68,11 +69,15 @@ public class FavoritosDbAdapter {
 
             // Al mismo tiempo, creamos fichero para conectar a la BBDD remota
             try {
-                FileOutputStream os = context.openFileOutput("IP.txt", MODE_PRIVATE);
-                OutputStreamWriter writer = new OutputStreamWriter(os);
-                writer.write("192.168.0.154:8080");
-                writer.close();
-                os.close();
+                File file = new File(context.getFilesDir() + "/IP.txt");
+                if (!file.exists()) {
+                    FileOutputStream os = context.openFileOutput("IP.txt", MODE_PRIVATE);
+                    OutputStreamWriter writer = new OutputStreamWriter(os);
+                    writer.write("192.168.0.154:8080");
+                    writer.close();
+                    os.close();
+                }
+
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
