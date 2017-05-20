@@ -123,7 +123,7 @@ public class BusquedaFragment extends Fragment {
                         // This method performs the actual data-refresh operation.
                         // The method calls setRefreshing(false) when it's finished.
                         new SetProgProxTask().execute();
-                        swipeRefreshLayout.setRefreshing(false);
+                        //swipeRefreshLayout.setRefreshing(false);
                     }
                 }
         );
