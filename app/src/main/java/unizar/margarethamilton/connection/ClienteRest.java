@@ -6,10 +6,13 @@ import android.database.Cursor;
 import org.json.*;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -24,6 +27,7 @@ import retrofit2.http.GET;
 import retrofit2.http.Query;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 
+import static android.content.Context.MODE_PRIVATE;
 import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_BAR;
 import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 
@@ -35,13 +39,22 @@ public class ClienteRest implements Serializable {
 
     public ClienteRest(Context ctx) {
         try {
-            FileInputStream fs = ctx.openFileInput("IP.txt");
-            InputStreamReader reader = new InputStreamReader(fs);
-            BufferedReader bufferedReader = new BufferedReader(reader);
-            URI = "http://"+bufferedReader.readLine()+"/baresTvServicio/rest/server/";
-            bufferedReader.close();
-            reader.close();
-            fs.close();
+            File file = new File(ctx.getFilesDir() + "/IP.txt");
+            if (!file.exists()) {
+                FileOutputStream os = ctx.openFileOutput("IP.txt", MODE_PRIVATE);
+                OutputStreamWriter writer = new OutputStreamWriter(os);
+                writer.write("http://192.168.1.165:8080/baresTvServicio/rest/server/");
+                writer.close();
+                os.close();
+            } else {
+                FileInputStream fs = ctx.openFileInput("IP.txt");
+                InputStreamReader reader = new InputStreamReader(fs);
+                BufferedReader bufferedReader = new BufferedReader(reader);
+                URI = bufferedReader.readLine();
+                bufferedReader.close();
+                reader.close();
+                fs.close();
+            }
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {

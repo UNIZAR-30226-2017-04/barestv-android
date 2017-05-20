@@ -67,22 +67,6 @@ public class FavoritosDbAdapter {
 
             super(context, DATABASE_NAME, null, DATABASE_VERSION);
 
-            // Al mismo tiempo, creamos fichero para conectar a la BBDD remota
-            try {
-                File file = new File(context.getFilesDir() + "/IP.txt");
-                if (!file.exists()) {
-                    FileOutputStream os = context.openFileOutput("IP.txt", MODE_PRIVATE);
-                    OutputStreamWriter writer = new OutputStreamWriter(os);
-                    writer.write("192.168.0.154:8080");
-                    writer.close();
-                    os.close();
-                }
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
         }
 
         @Override
