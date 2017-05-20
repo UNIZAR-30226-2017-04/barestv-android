@@ -130,6 +130,19 @@ public class DestacadoFragment extends Fragment {
         }
     }
 
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (this.isVisible())
+        {
+            if (isVisibleToUser) // If we are becoming visible, then...
+            {
+                swipeRefreshLayout.setRefreshing(true);
+                new SetPDestacadosTask().execute();
+            }
+        }
+    }
+
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonPressed(Uri uri) {
         if (mListener != null) {

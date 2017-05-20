@@ -155,11 +155,17 @@ public class FavoritosFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        android.util.Log.d("TAAAAG", "eeeeeeeeee");
-        new FavoritosFragment.SetFavoritosTask().execute();
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (this.isVisible())
+        {
+            if (isVisibleToUser) // If we are becoming visible, then...
+            {
+                swipeRefreshLayout.setRefreshing(true);
+                new FavoritosFragment.SetFavoritosTask().execute();
+            }
+        }
     }
 
     /**

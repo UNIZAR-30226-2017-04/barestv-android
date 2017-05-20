@@ -207,16 +207,22 @@ public class BusquedaFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean isVisibleToUser) {
         super.setUserVisibleHint(isVisibleToUser);
-        if (isVisibleToUser) {
-            if(hayFiltro){
-                snackbarFlitro.show();
-            }if(hayBusqueda){
-                new SetBusquedaTask(ultimaBusqueda).execute();
-            }
-        }
-        else {
-            if(hayFiltro){
-                snackbarFlitro.dismiss();
+        if (this.isVisible()) {
+            if (isVisibleToUser) {
+
+                if (hayFiltro) {
+                    snackbarFlitro.show();
+                }
+                if (hayBusqueda) {
+                    new SetBusquedaTask(ultimaBusqueda).execute();
+                } else {
+                    swipeRefreshLayout.setRefreshing(true);
+                    new SetProgProxTask().execute();
+                }
+            } else {
+                if (hayFiltro) {
+                    snackbarFlitro.dismiss();
+                }
             }
         }
     }
@@ -318,6 +324,8 @@ public class BusquedaFragment extends Fragment {
                         data.getIntExtra("FiltroFechaAño",0));
             }
     }
+
+
 
     /**
      * Rellena el listview con datods dados por el API de forma asincrona para el caso de programacion proxima
