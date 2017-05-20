@@ -391,7 +391,8 @@ public class MapaFragment extends Fragment implements
         FragmentTransaction ft = getActivity().getSupportFragmentManager()
                 .beginTransaction();
         ft.remove(fragment);
-        ft.commit();
+        try {
+        ft.commit(); } catch (Exception e) { e.printStackTrace(); }
     }
 
 

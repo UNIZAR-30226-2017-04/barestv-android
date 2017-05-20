@@ -418,7 +418,7 @@ public class BusquedaFragment extends Fragment {
             if (snackbar != null) snackbar.dismiss();
 
             // Obtiene del BBDD remoto las programaciones destacadas
-            List<HashMap<String, String>> programacion = clienteRest.buscar(query,"",1,1,1);
+            List<HashMap<String, String>> programacion = clienteRest.buscar(query,"",0,0,0);
 
             // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
@@ -453,7 +453,7 @@ public class BusquedaFragment extends Fragment {
                         programacionFiltrada = clienteRest.buscar(query, filtroCategoria, filtroFechaDia,
                                 filtroFechaMes, filtroFechaAño);
                     }else {
-                        programacionFiltrada = clienteRest.buscar(query,filtroCategoria,1,1,1);
+                        programacionFiltrada = clienteRest.buscar(query,filtroCategoria,0,0,0);
                     }
                     // Configurar el adapter
                     res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,

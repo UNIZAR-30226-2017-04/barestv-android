@@ -56,8 +56,9 @@ public class ListHashAdapter extends ArrayAdapter {
                 v[i] = convertView.findViewById(to[i]);
             }
             convertView.setTag(v);
-        } else
+        } else {
             v = (View[]) convertView.getTag();
+        }
 
         HashMap<String, String> entry = (HashMap<String, String>) this.getItem(position);
 

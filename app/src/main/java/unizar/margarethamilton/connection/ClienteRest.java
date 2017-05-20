@@ -35,7 +35,7 @@ import static unizar.margarethamilton.dataBase.FavoritosDbAdapter.KEY_TITULO;
 public class ClienteRest implements Serializable {
     // dirección por defecto de la api
     //private static final String URI = "http://192.168.0.154:8080/baresTvServicio/rest/server/";
-    private static String URI = "http://192.168.1.165:8080/baresTvServicio/rest/server/";
+    private static String URI = "https://barestvservicio.herokuapp.com/rest/server/";
 
     public ClienteRest(Context ctx) {
         try {
@@ -43,7 +43,7 @@ public class ClienteRest implements Serializable {
             if (!file.exists()) {
                 FileOutputStream os = ctx.openFileOutput("IP.txt", MODE_PRIVATE);
                 OutputStreamWriter writer = new OutputStreamWriter(os);
-                writer.write("http://192.168.1.165:8080/baresTvServicio/rest/server/");
+                writer.write("https://barestvservicio.herokuapp.com/rest/server/");
                 writer.close();
                 os.close();
             } else {
