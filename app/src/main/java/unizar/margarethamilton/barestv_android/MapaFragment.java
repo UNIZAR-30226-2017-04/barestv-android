@@ -121,10 +121,6 @@ public class MapaFragment extends Fragment implements
             // Map is ready
             //Toast.makeText(getActivity(), "Map Fragment was loaded properly!", Toast.LENGTH_SHORT).show();
             MapaFragmentPermissionsDispatcher.getMyLocationWithCheck(this);
-            LatLng barejemplo = new LatLng(46, 0);
-            googleMap.addMarker(new MarkerOptions().position(barejemplo)
-                    .title("barejemplo"));
-
             map.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
                 @Override
                 public boolean onMarkerClick(Marker marker) {
@@ -281,10 +277,6 @@ public class MapaFragment extends Fragment implements
             map.animateCamera(cameraUpdate);
             new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
 
-            //añadirMarcadores(location.getLatitude(),location.getLongitude());
-            LatLng barejemplo = new LatLng(46, 0);
-            map.addMarker(new MarkerOptions().position(barejemplo)
-                    .title("barejemplo"));
         } else {
             if (snackbar != null) snackbar.dismiss();
             snackbar = Snackbar.make(view, R.string.error_conexion_gps, Snackbar.LENGTH_INDEFINITE)
