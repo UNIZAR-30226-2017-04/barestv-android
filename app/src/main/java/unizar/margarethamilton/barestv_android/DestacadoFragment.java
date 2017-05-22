@@ -44,6 +44,7 @@ public class DestacadoFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private Snackbar snackbar = null;
     private FavoritosDbAdapter mDbHelper; // Acceso a BBDD
+    private boolean start = true;
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -246,6 +247,11 @@ public class DestacadoFragment extends Fragment {
             } else {
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
+                if (start == true) {
+                    swipeRefreshLayout.setRefreshing(true);
+                    start = false;
+                    new SetPDestacadosTask().execute();
+                }
             }
         }
     }
