@@ -41,6 +41,9 @@ public class BusquedaFragment extends Fragment {
     private ListView mList;
     private SwipeRefreshLayout swipeRefreshLayout;
 
+    private List<HashMap<String, String>> pGlobal = null;
+    private ArrayAdapter adapterGlobal = null;
+
     private Snackbar snackbar = null;
     private Snackbar snackbarFlitro = null;
 
@@ -202,6 +205,8 @@ public class BusquedaFragment extends Fragment {
                 mDbHelper.introducirFavoritos(tituloV.getText().toString(), barV.getText().toString(),
                         descrV.getText().toString(), inicioV.getText().toString(),
                         finV.getText().toString(), catV.getText().toString());
+                pGlobal.get(mList.getPositionForView(vwParentRow)).put("CheckBox", "1") ;
+                adapterGlobal.notifyDataSetChanged();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -209,6 +214,12 @@ public class BusquedaFragment extends Fragment {
             TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
             TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
             mDbHelper.EliminarFavoritos(tituloV.getText().toString(), barV.getText().toString());
+            try {
+                pGlobal.get(mList.getPositionForView(vwParentRow)).put("CheckBox", "0");
+                adapterGlobal.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -356,6 +367,7 @@ public class BusquedaFragment extends Fragment {
 
         protected void onPreExecute () {
             swipeRefreshLayout.setRefreshing(true);
+            pGlobal = null;
         }
 
         /**
@@ -370,6 +382,7 @@ public class BusquedaFragment extends Fragment {
 
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionProxima();
+
 
             // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
@@ -392,6 +405,8 @@ public class BusquedaFragment extends Fragment {
             // Crear un array done sse especifica los campos de ListView que se quiere rellenar
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                     R.id.inicio, R.id.fin,R.id.favCheck};
+
+            pGlobal = programacion;
             ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                     programacion, from, to);
             if(hayFiltro){
@@ -403,6 +418,7 @@ public class BusquedaFragment extends Fragment {
                             programacionFiltrada.add(s);
                         }
                     }
+                    pGlobal = programacionFiltrada;
                     // Configurar el adapter
                     res =  new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
@@ -426,7 +442,8 @@ public class BusquedaFragment extends Fragment {
                 } catch (Exception x) { x.printStackTrace();}
                 swipeRefreshLayout.setRefreshing(false);
             } else {
-                mList.setAdapter(adapter);
+                adapterGlobal = adapter;
+                mList.setAdapter(adapterGlobal);
                 swipeRefreshLayout.setRefreshing(false);
             }
         }
@@ -446,6 +463,7 @@ public class BusquedaFragment extends Fragment {
 
         protected void onPreExecute () {
             swipeRefreshLayout.setRefreshing(true);
+            pGlobal = null;
         }
 
         /**
@@ -483,6 +501,8 @@ public class BusquedaFragment extends Fragment {
                 String realQuery = query.split("Bar:")[1];
                 programacion=clienteRest.getProgramacionDadoBar(realQuery);
             }
+
+            pGlobal = programacion;
             ListHashAdapter res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                     programacion, from, to);
             if(hayFiltro){
@@ -496,10 +516,12 @@ public class BusquedaFragment extends Fragment {
                         programacionFiltrada = clienteRest.buscar(query,filtroCategoria,0,0,0);
                     }
                     // Configurar el adapter
+                    pGlobal = programacionFiltrada;
                     res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
                 } else if(hayFiltroFecha){
                     programacionFiltrada=clienteRest.buscar(query,"",filtroFechaDia,filtroFechaMes,filtroFechaAño);
+                    pGlobal = programacionFiltrada;
                     res = new ListHashAdapter(getActivity(), R.layout.busqueda_listview_content,
                             programacionFiltrada, from, to);
                 }
@@ -526,7 +548,8 @@ public class BusquedaFragment extends Fragment {
                     noResText.setVisibility(View.VISIBLE);
                 }
                 searchView.setQuery(query,false);
-                mList.setAdapter(adapter);
+                adapterGlobal = adapter;
+                mList.setAdapter(adapterGlobal);
                 swipeRefreshLayout.setRefreshing(false);
             }
         }

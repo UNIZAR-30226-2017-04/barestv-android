@@ -44,6 +44,8 @@ public class DestacadoFragment extends Fragment {
     private Snackbar snackbar = null;
     private FavoritosDbAdapter mDbHelper; // Acceso a BBDD
     private boolean start = true;
+    private List<HashMap<String, String>> pGlobal = null;
+    private ArrayAdapter adapterGlobal = null;
 
     public DestacadoFragment() {
         // Required empty public constructor
@@ -127,6 +129,8 @@ public class DestacadoFragment extends Fragment {
                 mDbHelper.introducirFavoritos(tituloV.getText().toString(), barV.getText().toString(),
                         descrV.getText().toString(), inicioV.getText().toString(),
                         finV.getText().toString(), catV.getText().toString());
+                pGlobal.get(mList.getPositionForView(vwParentRow)).put("CheckBox", "1") ;
+                adapterGlobal.notifyDataSetChanged();
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -134,6 +138,12 @@ public class DestacadoFragment extends Fragment {
             TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
             TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
             mDbHelper.EliminarFavoritos(tituloV.getText().toString(), barV.getText().toString());
+            try {
+                pGlobal.get(mList.getPositionForView(vwParentRow)).put("CheckBox", "0");
+                adapterGlobal.notifyDataSetChanged();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -192,6 +202,7 @@ public class DestacadoFragment extends Fragment {
 
         protected void onPreExecute () {
             swipeRefreshLayout.setRefreshing(true);
+            pGlobal = null;
         }
 
         /**
@@ -206,6 +217,7 @@ public class DestacadoFragment extends Fragment {
 
             // Obtiene del BBDD remoto las programaciones destacadas
             List<HashMap<String, String>> programacion = clienteRest.getProgramacionDestacada();
+
 
             // Si no se ha podido establecer la conexion
             if (programacion == null) return null;
@@ -229,6 +241,7 @@ public class DestacadoFragment extends Fragment {
             int[] to = new int[] { R.id.titulo , R.id.categoria, R.id.bar, R.id.descr,
                     R.id.inicio, R.id.fin, R.id.favCheck};
 
+            pGlobal= programacion;
             // Configurar el adapter
 
             return new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
@@ -249,7 +262,9 @@ public class DestacadoFragment extends Fragment {
                 } catch (Exception x) { x.printStackTrace();}
                 swipeRefreshLayout.setRefreshing(false);
             } else {
-                mList.setAdapter(adapter);
+
+                adapterGlobal = adapter;
+                mList.setAdapter(adapterGlobal);
                 swipeRefreshLayout.setRefreshing(false);
                 if (start) {
                     swipeRefreshLayout.setRefreshing(true);
