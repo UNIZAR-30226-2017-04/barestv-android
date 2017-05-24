@@ -29,6 +29,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -52,13 +53,15 @@ public class MapaFragment extends Fragment implements
 
     private SupportMapFragment mapFragment;
     private GoogleMap map;
+    Marker marker;
+    String bar;
+    Location location;
     private UiSettings mUiSettings;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
     private long UPDATE_INTERVAL = 60000;  /* 60 secs */
     private long FASTEST_INTERVAL = 5000; /* 5 secs */
 
-    private int prueba = 0;
 
     /*
      * Define a request code to send to Google Play services This code is
@@ -210,7 +213,11 @@ public class MapaFragment extends Fragment implements
     }
 
     //TODO: metodo que recibe el nombre del bar y lo muestra
-    public void mostrarBar(String bar){}
+    public void mostrarBar(String bar){
+        this.bar = bar;
+        new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+
+    }
 
     /*
      * Handle results returned to the FragmentActivity by Google Play services
@@ -265,6 +272,10 @@ public class MapaFragment extends Fragment implements
      */
     @Override
     public void onConnected(Bundle dataBundle) {
+        if(location!=null) {
+
+            new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+        }
         if (mGoogleApiClient==null){
             mGoogleApiClient = new GoogleApiClient.Builder(getActivity())
                     .addApi(LocationServices.API)
@@ -274,7 +285,7 @@ public class MapaFragment extends Fragment implements
         mGoogleApiClient.connect();
         startLocationUpdates();
         // Display the connection status
-        Location location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        location = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         if (location != null) {
             //Toast.makeText(getActivity(), "GPS location was found!", Toast.LENGTH_SHORT).show();
             LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
@@ -306,7 +317,7 @@ public class MapaFragment extends Fragment implements
 //                Double.toString(location.getLatitude()) + "," +
 //                Double.toString(location.getLongitude());
 //        Toast.makeText(getActivity(), msg, Toast.LENGTH_SHORT).show();
-        new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+//        new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
 
     }
 
@@ -392,6 +403,20 @@ public class MapaFragment extends Fragment implements
         ft.commit(); } catch (Exception e) { e.printStackTrace(); }
     }
 
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (this.isVisible())
+        {
+            if (isVisibleToUser) // If we are becoming visible, then...
+            {
+                if(location!=null) {
+                    new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+                }
+            }
+        }
+    }
+
 
     /**
      * Rellena el listview con datods dados por el API de forma asincrona para el caso de programacion proxima
@@ -418,7 +443,7 @@ public class MapaFragment extends Fragment implements
 
 
             // Obtiene del BBDD remoto las programaciones destacadas
-            return clienteRest.getBares(latitud,longitud,100);
+            return clienteRest.getBares(latitud,longitud,6379);
 
 
 
@@ -447,9 +472,23 @@ public class MapaFragment extends Fragment implements
                     nombre = bares.get(i).get("Nombre");
                     lat = Double.parseDouble(bares.get(i).get("Lat"));
                     lng = Double.parseDouble(bares.get(i).get("Lng"));
-                    map.addMarker(new MarkerOptions()
-                            .position(new LatLng(lat, lng))
-                            .title(nombre));
+                    if(bar==null || !bar.equals(nombre)){
+                        map.addMarker(new MarkerOptions()
+                                .position(new LatLng(lat, lng))
+                                .title(nombre));
+                    }
+                    else{
+                        marker = map.addMarker(new MarkerOptions()
+                                .position(new LatLng(lat, lng))
+                                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
+                                .title(nombre));
+                        LatLng latLng = new LatLng(lat, lng);
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+                        map.animateCamera(cameraUpdate);
+                        bar=null;
+
+                    }
+
                 }
             }
         }
