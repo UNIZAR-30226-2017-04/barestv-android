@@ -12,6 +12,15 @@
             android:layout_height="wrap_content"
             android:orientation="vertical">
 
+            <TextView
+                android:id="@+id/TextoFiltroFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/texto_filtro_fecha"
+                android:textAlignment="center"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="24sp" />
+
             <DatePicker
                 android:id="@+id/datePicker"
                 android:layout_width="match_parent"
@@ -19,6 +28,15 @@
                 android:layout_marginLeft="20dp"
                 android:datePickerMode="calendar"
                 android:headerBackground="@color/colorAccent" />
+
+            <TextView
+                android:id="@+id/TextoFiltroCategoria"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/texto_filtro_categoria"
+                android:textAlignment="center"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="24sp" />
 
             <GridView
                 android:id="@+id/cat_grid"

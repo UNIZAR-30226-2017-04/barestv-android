@@ -206,6 +206,7 @@ public class MapaFragment extends Fragment implements
     /*Interfaz para comunicar a la busqueda el bar pulsado*/
     public interface OnFragmentInteractionListener {
         void barPulsado(String bar);
+
     }
     /*
      * Handle results returned to the FragmentActivity by Google Play services

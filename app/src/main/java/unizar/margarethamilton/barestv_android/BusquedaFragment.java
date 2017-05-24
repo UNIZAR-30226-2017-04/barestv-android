@@ -132,7 +132,12 @@ public class BusquedaFragment extends Fragment {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                listText.setText("Búsqueda: "+query);
+                if(query.contains("Bar:")){
+                    String realQuery = query.split("Bar:")[1];
+                    listText.setText(getString(R.string.TextoBusqueda)+realQuery);
+                }else {
+                    listText.setText(getString(R.string.TextoBusqueda) + query);
+                }
                 new SetBusquedaTask(query).execute();
                 swipeRefreshLayout.setEnabled(false);
 
@@ -237,7 +242,7 @@ public class BusquedaFragment extends Fragment {
     }
 
     public void programacionBar(String bar){
-    //TODO: por implementar
+        listText.setText(getString(R.string.TextoBusqueda)+bar);
         new SetBusquedaTask("Bar:"+bar).execute();
     }
 

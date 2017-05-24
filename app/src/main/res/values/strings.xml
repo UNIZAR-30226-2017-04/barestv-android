@@ -20,5 +20,8 @@
 
     <string name="google_maps_api_key">AIzaSyBB5a4jGpahlPNP7-zup6RSWdJc1YU-09c</string>
     <string name="emptyList">No se han encontrado resultados :(</string>
+    <string name="TextoBusqueda">Búsqueda:</string>
+    <string name="texto_filtro_fecha">Filtro por fecha:</string>
+    <string name="texto_filtro_categoria">Filtro por categoría:</string>
 
 </resources>
