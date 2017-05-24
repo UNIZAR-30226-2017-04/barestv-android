@@ -1,37 +1,24 @@
 package unizar.margarethamilton.barestv_android;
 
-import android.Manifest;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
+import android.os.Bundle;
 import android.support.design.widget.TabLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-
 import android.view.WindowManager;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import unizar.margarethamilton.connection.ClienteRest;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 
-public class activity_tabs extends AppCompatActivity implements MapaFragment.OnFragmentInteractionListener {
+public class activity_tabs extends AppCompatActivity implements
+        MapaFragment.OnFragmentMapaInteractionListener,
+        BusquedaFragment.OnFragmentBusquedaInteractionListener,
+        DestacadoFragment.OnFragmentDestacadoInteractionListener{
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -99,11 +86,30 @@ public class activity_tabs extends AppCompatActivity implements MapaFragment.OnF
     public void favoritosClick (View v) {
         favoritosFragment.favoritosClick(v);
     }
+    /*
+        Metodos de la interfaz de comunicacion busqueda-mapa
+     */
 
+    //Interfaz OnFragmentMapaInteractionListener
+    //Bar pulsado en mapa para buscar sus programas
     public void barPulsado(String bar){
         mViewPager.setCurrentItem(1);
         busquedaFragment.programacionBar(bar);
 
+    }
+
+    //Interfaz OnFragmentBusquedaInteractionListener
+    //Programa pulsado en busqueda para mostrar el bar
+    public void programaPulsado(String bar){
+        mViewPager.setCurrentItem(3);
+        mapaFragment.mostrarBar(bar);
+    }
+
+    //Interfaz OnFragmentDestacadoInteractionListener
+    //Programa pulsado en destacados para mostrar el bar
+    public void programaPulsadoDes(String bar){
+        mViewPager.setCurrentItem(3);
+        mapaFragment.mostrarBar(bar);
     }
     /**
      * A {@link FragmentPagerAdapter} that returns a fragment corresponding to

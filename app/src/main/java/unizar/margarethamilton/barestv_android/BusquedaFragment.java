@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -28,10 +29,6 @@ import java.util.List;
 import unizar.margarethamilton.connection.ClienteRest;
 import unizar.margarethamilton.dataBase.FavoritosDbAdapter;
 import unizar.margarethamilton.listViewConfig.ListHashAdapter;
-
-/**
- * Created by ivo on 21/03/17.
- */
 
 public class BusquedaFragment extends Fragment {
 
@@ -60,6 +57,7 @@ public class BusquedaFragment extends Fragment {
     private int filtroFechaAño;
 
     private static ClienteRest clienteRest;
+    private OnFragmentBusquedaInteractionListener mListener;
 
     public BusquedaFragment(){}
 
@@ -109,12 +107,15 @@ public class BusquedaFragment extends Fragment {
             }
         });
         searchView.setQueryHint(getString(R.string.search_hint));
-
         listText = (TextView) view.findViewById(R.id.listText);
         listText.setText(R.string.progProx);
-        //Se obtiene la programacion proxima
-        new SetProgProxTask().execute();
-
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView bar = (TextView) parent.findViewById(R.id.bar);
+                mListener.programaPulsado((String)bar.getText());
+            }
+        });
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefreshProx);
         swipeRefreshLayout.setOnRefreshListener(
                 new SwipeRefreshLayout.OnRefreshListener() {
@@ -127,7 +128,6 @@ public class BusquedaFragment extends Fragment {
                     }
                 }
         );
-
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -156,13 +156,12 @@ public class BusquedaFragment extends Fragment {
         });
 
         ImageView closeButton = (ImageView)searchView.findViewById(R.id.search_close_btn);
-
         // Set on click listener
         closeButton.setOnClickListener(new View.OnClickListener() {
 
             @Override
             public void onClick(View v) {
-            listText.setText(R.string.progProx);
+                listText.setText(R.string.progProx);
                 searchView.setQuery("",false);
                 new SetProgProxTask().execute();
                 swipeRefreshLayout.setEnabled(true);
@@ -176,6 +175,10 @@ public class BusquedaFragment extends Fragment {
                 return false;
             }
         });
+
+
+        //Se obtiene la programacion proxima
+        new SetProgProxTask().execute();
 
         if(snackbarFlitro!=null){
             snackbarFlitro.show();
@@ -293,11 +296,20 @@ public class BusquedaFragment extends Fragment {
         }
 
     }
-
+    /*Interfaz para comunicar a la busqueda el bar pulsado*/
+    public interface OnFragmentBusquedaInteractionListener {
+        void programaPulsado(String bar);
+    }
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
+        if (context instanceof OnFragmentBusquedaInteractionListener) {
+            mListener = (OnFragmentBusquedaInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -465,7 +477,7 @@ public class BusquedaFragment extends Fragment {
                     programacion, from, to);
             if(hayFiltro){
                 quitarFiltros();
-                List<HashMap<String, String>> programacionFiltrada = new ArrayList<HashMap<String, String>>();
+                List<HashMap<String, String>> programacionFiltrada;
                 if(!filtroCategoria.isEmpty()) {
                     if(hayFiltroFecha) {
                         programacionFiltrada = clienteRest.buscar(query, filtroCategoria, filtroFechaDia,

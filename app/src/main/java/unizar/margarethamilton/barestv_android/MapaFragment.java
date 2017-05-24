@@ -67,7 +67,7 @@ public class MapaFragment extends Fragment implements
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     View view;
 
-    OnFragmentInteractionListener mListener;
+    OnFragmentMapaInteractionListener mListener;
 
 
     public static MapaFragment newInstance(ClienteRest _clienteRest) {
@@ -189,8 +189,8 @@ public class MapaFragment extends Fragment implements
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        if (context instanceof OnFragmentInteractionListener) {
-            mListener = (OnFragmentInteractionListener) context;
+        if (context instanceof OnFragmentMapaInteractionListener) {
+            mListener = (OnFragmentMapaInteractionListener) context;
         } else {
             throw new RuntimeException(context.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -204,10 +204,14 @@ public class MapaFragment extends Fragment implements
     }
 
     /*Interfaz para comunicar a la busqueda el bar pulsado*/
-    public interface OnFragmentInteractionListener {
+    public interface OnFragmentMapaInteractionListener {
         void barPulsado(String bar);
-
+        void programaPulsado(String bar);
     }
+
+    //TODO: metodo que recibe el nombre del bar y lo muestra
+    public void mostrarBar(String bar){}
+
     /*
      * Handle results returned to the FragmentActivity by Google Play services
      */
@@ -414,9 +418,8 @@ public class MapaFragment extends Fragment implements
 
 
             // Obtiene del BBDD remoto las programaciones destacadas
-            List<HashMap<String, String>> bares = clienteRest.getBares(latitud,longitud,100);
+            return clienteRest.getBares(latitud,longitud,100);
 
-            return bares;
 
 
         }

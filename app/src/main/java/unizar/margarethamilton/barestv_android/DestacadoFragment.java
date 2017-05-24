@@ -1,7 +1,6 @@
 package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -9,9 +8,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
@@ -27,7 +26,7 @@ import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link DestacadoFragment.OnFragmentInteractionListener} interface
+ * {@link DestacadoFragment.OnFragmentDestacadoInteractionListener} interface
  * to handle interaction events.
  * Use the {@link DestacadoFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -37,7 +36,7 @@ public class DestacadoFragment extends Fragment {
     private static final String ARG_PARAM1 = "clientRest";
 
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentDestacadoInteractionListener mListener;
     private ClienteRest clienteRest;
     private View view ;
     private ListView mList;
@@ -84,6 +83,13 @@ public class DestacadoFragment extends Fragment {
         view = inflater.inflate(R.layout.destacado_fragment_layout, container, false);
 
         mList = (ListView) view.findViewById(R.id.list);
+        mList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                TextView bar = (TextView) parent.findViewById(R.id.bar);
+                mListener.programaPulsadoDes((String)bar.getText());
+            }
+        });
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swiperefresh);
         swipeRefreshLayout.setRefreshing(true);
 
@@ -145,22 +151,17 @@ public class DestacadoFragment extends Fragment {
         }
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
+
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-//        if (context instanceof OnFragmentInteractionListener) {
-//            mListener = (OnFragmentInteractionListener) context;
-//        } else {
-//            throw new RuntimeException(context.toString()
-//                    + " must implement OnFragmentInteractionListener");
-//        }
+        if (context instanceof OnFragmentDestacadoInteractionListener) {
+            mListener = (OnFragmentDestacadoInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement OnFragmentInteractionListener");
+        }
     }
 
     @Override
@@ -179,9 +180,8 @@ public class DestacadoFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
+    public interface OnFragmentDestacadoInteractionListener {
+        void programaPulsadoDes(String bar);
     }
 
 
@@ -226,10 +226,9 @@ public class DestacadoFragment extends Fragment {
                     R.id.inicio, R.id.fin, R.id.favCheck};
 
             // Configurar el adapter
-            ArrayAdapter adapter = new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
-                        programacion, from, to);
 
-            return adapter;
+            return new ListHashAdapter(DestacadoFragment.this.getActivity(), R.layout.destacado_listview_content,
+                        programacion, from, to);
         }
 
         /**
@@ -248,7 +247,7 @@ public class DestacadoFragment extends Fragment {
             } else {
                 mList.setAdapter(adapter);
                 swipeRefreshLayout.setRefreshing(false);
-                if (start == true) {
+                if (start) {
                     swipeRefreshLayout.setRefreshing(true);
                     start = false;
                     new SetPDestacadosTask().execute();

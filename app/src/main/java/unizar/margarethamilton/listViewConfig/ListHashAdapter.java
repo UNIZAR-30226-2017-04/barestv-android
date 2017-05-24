@@ -61,7 +61,6 @@ public class ListHashAdapter extends ArrayAdapter {
         }
 
         HashMap<String, String> entry = (HashMap<String, String>) this.getItem(position);
-
         try {
             // Mapea los datos a los campos del ListView
             for (int i = 0; i < from.length; i++) {
@@ -70,6 +69,7 @@ public class ListHashAdapter extends ArrayAdapter {
                 } else if (v[i] instanceof TextView) {
                     setViewText((TextView) v[i], entry.get(from[i]));
                 }
+
 
             }
         } catch (Exception e) { e.printStackTrace(); }

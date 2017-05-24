@@ -2,7 +2,6 @@ package unizar.margarethamilton.barestv_android;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -13,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -29,7 +27,6 @@ import unizar.margarethamilton.listViewConfig.ListHashAdapter;
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
- * {@link FavoritosFragment.OnFragmentInteractionListener} interface
  * to handle interaction events.
  * Use the {@link FavoritosFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -39,7 +36,6 @@ public class FavoritosFragment extends Fragment {
     private static final String ARG_PARAM1 = "clientRest";
 
 
-    private DestacadoFragment.OnFragmentInteractionListener mListener;
     private ClienteRest clienteRest;
     private View view ;
     private ListView mList;
@@ -116,12 +112,6 @@ public class FavoritosFragment extends Fragment {
     }
 
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
-        }
-    }
 
     @Override
     public void onAttach(Context context) {
@@ -137,7 +127,6 @@ public class FavoritosFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
     }
 
     /**
@@ -150,10 +139,6 @@ public class FavoritosFragment extends Fragment {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
 
     public void setUserVisibleHint(boolean isVisibleToUser)
     {
@@ -198,10 +183,9 @@ public class FavoritosFragment extends Fragment {
                     R.id.inicio, R.id.fin};
 
             // Configurar el adapter
-            ArrayAdapter adapter = new ListHashAdapter(FavoritosFragment.this.getActivity(),
-                    R.layout.favoritos_listview_content, programacion, from, to);
 
-            return adapter;
+            return new ListHashAdapter(FavoritosFragment.this.getActivity(),
+                    R.layout.favoritos_listview_content, programacion, from, to);
         }
 
         /**
