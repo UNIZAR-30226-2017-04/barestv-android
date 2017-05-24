@@ -162,6 +162,7 @@ public class FavoritosFragment extends Fragment {
         {
             if (isVisibleToUser) // If we are becoming visible, then...
             {
+                mList.setAdapter(null);
                 swipeRefreshLayout.setRefreshing(true);
                 new FavoritosFragment.SetFavoritosTask().execute();
             }

@@ -213,7 +213,10 @@ public class BusquedaFragment extends Fragment {
                 if (hayFiltro) {
                     snackbarFlitro.show();
                 }
-                if (hayBusqueda) {
+
+                mList.setAdapter(null);
+                if (hayBusqueda)
+                {
                     new SetBusquedaTask(ultimaBusqueda).execute();
                 } else {
                     swipeRefreshLayout.setRefreshing(true);
@@ -276,6 +279,8 @@ public class BusquedaFragment extends Fragment {
 //                filtroFechaMes="0"+filtroFechaMes;
 //            }
         }
+        mList.setAdapter(null);
+        swipeRefreshLayout.setRefreshing(true);
         if(hayBusqueda){
             new SetBusquedaTask(ultimaBusqueda);
         }else {

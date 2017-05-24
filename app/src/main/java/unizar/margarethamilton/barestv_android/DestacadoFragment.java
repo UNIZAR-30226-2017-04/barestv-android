@@ -138,6 +138,7 @@ public class DestacadoFragment extends Fragment {
         {
             if (isVisibleToUser) // If we are becoming visible, then...
             {
+                mList.setAdapter(null);
                 swipeRefreshLayout.setRefreshing(true);
                 new SetPDestacadosTask().execute();
             }
