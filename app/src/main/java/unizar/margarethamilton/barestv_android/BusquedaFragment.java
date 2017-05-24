@@ -353,6 +353,11 @@ public class BusquedaFragment extends Fragment {
      * Rellena el listview con datods dados por el API de forma asincrona para el caso de programacion proxima
      */
     private class SetProgProxTask extends AsyncTask<Void, Void, ArrayAdapter> {
+
+        protected void onPreExecute () {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
         /**
          * Comunicacion asincrona
          * @param e void
@@ -438,6 +443,11 @@ public class BusquedaFragment extends Fragment {
             Calendar c =Calendar.getInstance();
 
         }
+
+        protected void onPreExecute () {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
         /**
          * Comunicacion asincrona
          * @param e void

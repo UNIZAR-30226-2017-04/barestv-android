@@ -190,6 +190,10 @@ public class DestacadoFragment extends Fragment {
      */
     private class SetPDestacadosTask extends AsyncTask<Void, Void, ArrayAdapter> {
 
+        protected void onPreExecute () {
+            swipeRefreshLayout.setRefreshing(true);
+        }
+
         /**
          * Comunicacion asincrona
          * @param e void

@@ -127,20 +127,26 @@ public class FavoritosDbAdapter {
      */
     public long introducirFavoritos(String titulo, String bar, String descr, String inicio,
                                     String fin, String cat) {
-        ContentValues initialValues = new ContentValues();
+
+        try {
+            ContentValues initialValues = new ContentValues();
 
         /*
         if (DatabaseUtils.queryNumEntries(mDb, DATABASE_TABLE) >= 1000) {
             return -1;
         }*/
-        initialValues.put(KEY_TITULO, titulo);
-        initialValues.put(KEY_BAR, bar);
-        initialValues.put(KEY_DESCR, descr);
-        initialValues.put(KEY_INICIO, inicio);
-        initialValues.put(KEY_FIN, fin);
-        initialValues.put(KEY_CAT, cat);
+            initialValues.put(KEY_TITULO, titulo);
+            initialValues.put(KEY_BAR, bar);
+            initialValues.put(KEY_DESCR, descr);
+            initialValues.put(KEY_INICIO, inicio);
+            initialValues.put(KEY_FIN, fin);
+            initialValues.put(KEY_CAT, cat);
 
-        return mDb.insert(DATABASE_TABLE, null, initialValues);
+            return mDb.insert(DATABASE_TABLE, null, initialValues);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return -1;
+        }
     }
 
     /**
@@ -151,9 +157,14 @@ public class FavoritosDbAdapter {
      * @return true en caso de eliminar con exito
      */
     public boolean EliminarFavoritos(String titulo, String bar) {
-        String[] args = {titulo, bar};
-        return mDb.delete(DATABASE_TABLE, KEY_TITULO + "=?" + " AND " +
-                KEY_BAR + "=?", args) > 0;
+        try {
+            String[] args = {titulo, bar};
+            return mDb.delete(DATABASE_TABLE, KEY_TITULO + "=?" + " AND " +
+                    KEY_BAR + "=?", args) > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -162,7 +173,12 @@ public class FavoritosDbAdapter {
      * @return true en caso de eliminar con exito
      */
     public boolean EliminarTodosFavoritos() {
-        return mDb.delete(DATABASE_TABLE, null, null) > 0;
+        try {
+            return mDb.delete(DATABASE_TABLE, null, null) > 0;
+        } catch (Exception e){
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /**
@@ -171,9 +187,13 @@ public class FavoritosDbAdapter {
      * @return Cursor sobre todos los favoritos
      */
     public Cursor ExtraerFavoritosAPI() {
-
-        return mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO,
-                KEY_BAR}, null, null, null, null, KEY_BAR);
+        try {
+            return mDb.query(DATABASE_TABLE, new String[]{KEY_TITULO,
+                    KEY_BAR}, null, null, null, null, KEY_BAR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -182,9 +202,13 @@ public class FavoritosDbAdapter {
      * @return Cursor sobre todos los favoritos
      */
     public Cursor ExtraerFavoritos() {
-
-        return mDb.query(DATABASE_TABLE, new String[] {"rowid _id", KEY_TITULO,
-                KEY_BAR, KEY_DESCR, KEY_INICIO, KEY_FIN, KEY_CAT}, null, null, null, null, KEY_BAR);
+        try {
+            return mDb.query(DATABASE_TABLE, new String[]{"rowid _id", KEY_TITULO,
+                    KEY_BAR, KEY_DESCR, KEY_INICIO, KEY_FIN, KEY_CAT}, null, null, null, null, KEY_BAR);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /**
@@ -228,12 +252,16 @@ public class FavoritosDbAdapter {
      * @return true en caso de que existe y falso en caso contrario
      */
     public Boolean comprobarFavorito(String titulo, String bar) {
-        String[] args = {titulo, bar};
-        Cursor query = mDb.query(DATABASE_TABLE, new String[] {KEY_TITULO}, KEY_TITULO + "=?" +
-                " AND " + KEY_BAR + "=?", args, null, null, null, null);
-        boolean esFav = query.getCount()>0;
-        query.close();
-        return esFav;
+        try {
+            String[] args = {titulo, bar};
+            Cursor query = mDb.query(DATABASE_TABLE, new String[]{KEY_TITULO}, KEY_TITULO + "=?" +
+                    " AND " + KEY_BAR + "=?", args, null, null, null, null);
+            boolean esFav = query.getCount() > 0;
+            query.close();
+            return esFav;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
 

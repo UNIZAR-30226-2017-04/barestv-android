@@ -107,7 +107,6 @@ public class FavoritosFragment extends Fragment {
         TextView tituloV = (TextView) vwParentRow.findViewById(R.id.titulo);
         TextView barV = (TextView) vwParentRow.findViewById(R.id.bar);
         mDbHelper.EliminarFavoritos(tituloV.getText().toString(), barV.getText().toString());
-        swipeRefreshLayout.setRefreshing(false);
         new SetFavoritosTask().execute();
     }
 
@@ -158,6 +157,10 @@ public class FavoritosFragment extends Fragment {
      * Rellena el listview con datods dados por el API de forma asincrona
      */
     private class SetFavoritosTask extends AsyncTask<Void, Void, ArrayAdapter> {
+
+        protected void onPreExecute () {
+            swipeRefreshLayout.setRefreshing(true);
+        }
 
         /**
          * Comunicacion asincrona
