@@ -215,7 +215,9 @@ public class MapaFragment extends Fragment implements
     //TODO: metodo que recibe el nombre del bar y lo muestra
     public void mostrarBar(String bar){
         this.bar = bar;
-        new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+        if(location!=null) {
+            new SetAñadirMarcadoresTask(location.getLatitude(), location.getLongitude()).execute();
+        }
 
     }
 
@@ -483,7 +485,7 @@ public class MapaFragment extends Fragment implements
                                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE))
                                 .title(nombre));
                         LatLng latLng = new LatLng(lat, lng);
-                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 17);
+                        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLng(latLng);
                         map.animateCamera(cameraUpdate);
                         bar=null;
 
