@@ -443,7 +443,7 @@ public class MapaFragment extends Fragment implements
 
 
             // Obtiene del BBDD remoto las programaciones destacadas
-            return clienteRest.getBares(latitud,longitud,6379);
+            return clienteRest.getBares(latitud,longitud,100000);
 
 
 
