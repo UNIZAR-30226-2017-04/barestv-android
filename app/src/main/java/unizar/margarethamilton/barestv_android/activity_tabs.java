@@ -24,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -72,6 +73,10 @@ public class activity_tabs extends AppCompatActivity implements MapaFragment.OnF
             TabLayout.Tab tab = tabLayout.getTabAt(i);
             tab.setCustomView(mSectionsPagerAdapter.getTabView(i));
         }
+
+        getWindow().setSoftInputMode(
+                WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN
+        );
 
         FavoritosDbAdapter mdb = new FavoritosDbAdapter(this);
         clienteRest = new ClienteRest(this);
