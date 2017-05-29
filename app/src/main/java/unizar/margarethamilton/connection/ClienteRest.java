@@ -201,8 +201,8 @@ public class ClienteRest implements Serializable {
                     hmp.put("Categoria", obj.getString("Cat"));
                     hmp.put("Bar", obj.getString("Bar"));
                     hmp.put("Descr", obj.getString("Descr"));
-                    hmp.put("Inicio", obj.getString("Inicio"));
-                    hmp.put("Fin", obj.getString("Fin"));
+                    hmp.put("Inicio", obj.getString("Inicio").substring(0,obj.getString("Inicio").length()-2));
+                    hmp.put("Fin", obj.getString("Fin").substring(0,obj.getString("Fin").length()-2));
                     programas.add(hmp);
 
                 } catch (JSONException e) {
@@ -259,8 +259,8 @@ public class ClienteRest implements Serializable {
                     hmp.put("Categoria", obj.getString("Cat"));
                     hmp.put("Bar", obj.getString("Bar"));
                     hmp.put("Descr", obj.getString("Descr"));
-                    hmp.put("Inicio", obj.getString("Inicio"));
-                    hmp.put("Fin", obj.getString("Fin"));
+                    hmp.put("Inicio", obj.getString("Inicio").substring(0,obj.getString("Inicio").length()-2));
+                    hmp.put("Fin", obj.getString("Fin").substring(0,obj.getString("Fin").length()-2));
                     programas.add(hmp);
 
                 } catch (JSONException e) {
@@ -316,8 +316,8 @@ public class ClienteRest implements Serializable {
                     hmp.put("Categoria", obj.getString("Cat"));
                     hmp.put("Bar", obj.getString("Bar"));
                     hmp.put("Descr", obj.getString("Descr"));
-                    hmp.put("Inicio", obj.getString("Inicio"));
-                    hmp.put("Fin", obj.getString("Fin"));
+                    hmp.put("Inicio", obj.getString("Inicio").substring(0,obj.getString("Inicio").length()-2));
+                    hmp.put("Fin", obj.getString("Fin").substring(0,obj.getString("Fin").length()-2));
                     programas.add(hmp);
 
                 } catch (JSONException e) {
@@ -380,8 +380,8 @@ public class ClienteRest implements Serializable {
                     hmp.put("Categoria", obj.getString("Cat"));
                     hmp.put("Bar", obj.getString("Bar"));
                     hmp.put("Descr", obj.getString("Descr"));
-                    hmp.put("Inicio", obj.getString("Inicio"));
-                    hmp.put("Fin", obj.getString("Fin"));
+                    hmp.put("Inicio", obj.getString("Inicio").substring(0,obj.getString("Inicio").length()-2));
+                    hmp.put("Fin", obj.getString("Fin").substring(0,obj.getString("Fin").length()-2));
                     programas.add(hmp);
 
                 } catch (JSONException e) {
@@ -466,8 +466,8 @@ public class ClienteRest implements Serializable {
                      hmp.put("Categoria", obj.getString("Cat"));
                      hmp.put("Bar", obj.getString("Bar"));
                      hmp.put("Descr", obj.getString("Descr"));
-                     hmp.put("Inicio", obj.getString("Inicio"));
-                     hmp.put("Fin", obj.getString("Fin"));
+                     hmp.put("Inicio", obj.getString("Inicio").substring(0,obj.getString("Inicio").length()-2));
+                     hmp.put("Fin", obj.getString("Fin").substring(0,obj.getString("Fin").length()-2));
                      favoritos.add(hmp);
 
                  } catch (JSONException e) {
