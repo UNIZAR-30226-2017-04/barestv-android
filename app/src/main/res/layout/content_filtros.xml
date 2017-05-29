@@ -41,7 +41,7 @@
             <GridView
                 android:id="@+id/cat_grid"
                 android:layout_width="match_parent"
-                android:layout_height="254dp"
+                android:layout_height="300dp"
                 android:numColumns="auto_fit"
                 android:verticalSpacing="20dp"
                 android:horizontalSpacing="10dp"
